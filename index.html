@@ -2,21 +2,40 @@
 <html lang="cs">
 <head>
   <meta charset="UTF-8">
-  <title>Moje stránka</title>
-  <!-- zde může být tvůj CSS -->
+  <title>Chráněný web</title>
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <style>
+    /* Obsah stránky je skrytý, dokud se nepřihlásíš */
+    #protected-content { display: none; }
+  </style>
 </head>
 <body>
-  <h1>Moje chráněná stránka</h1>
-  <p>Obsah uvidí jen přihlášení uživatelé.</p>
+  <div id="protected-content">
+    <h1>Vítej na chráněném webu!</h1>
+    <p>Tento obsah uvidí jen přihlášení uživatelé.</p>
+    <button id="logout">Odhlásit se</button>
+  </div>
 
-  <!-- vlastní JS -->
   <script>
+    // Inicializace Netlify Identity
     netlifyIdentity.init();
-    const user = netlifyIdentity.currentUser();
-    if (!user) {
+
+    // Kontrola přihlášení
+    netlifyIdentity.on('init', user => {
+      if(user) {
+        document.getElementById('protected-content').style.display = 'block';
+      } else {
+        // Otevře login widget
+        netlifyIdentity.open();
+      }
+    });
+
+    // Logout
+    document.getElementById('logout').addEventListener('click', () => {
+      netlifyIdentity.logout();
+      document.getElementById('protected-content').style.display = 'none';
       netlifyIdentity.open();
-    }
+    });
   </script>
 </body>
 </html>
