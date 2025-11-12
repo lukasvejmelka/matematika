@@ -4,6 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Příklady a řešení</title>
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+<script>
+  netlifyIdentity.init();
+
+  const user = netlifyIdentity.currentUser();
+  if (!user) {
+    // Přesměrování na login widget
+    netlifyIdentity.open(); 
+  }
+</script>
 <style>
     body {
         font-family: "Segoe UI", sans-serif;
@@ -187,3 +197,4 @@
 </script>
 </body>
 </html>
+
