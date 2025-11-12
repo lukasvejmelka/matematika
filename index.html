@@ -1,52 +1,189 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-  <meta charset="UTF-8">
-  <title>Chráněný web – Minimal Example - Rýma</title>
-  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-  <style>
-    #protected-content { display: none; font-family: sans-serif; padding: 20px; }
-    body { text-align: center; padding-top: 50px; font-family: sans-serif; }
-    button { margin-top: 20px; padding: 8px 16px; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Příklady a řešení</title>
+<style>
+    body {
+        font-family: "Segoe UI", sans-serif;
+        background-color: #f5f7fa;
+        margin: 0;
+        padding: 0;
+    }
+
+    header {
+        background-color: #1e88e5;
+        color: white;
+        padding: 1rem;
+        text-align: center;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    .container {
+        max-width: 900px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+
+    select {
+        font-size: 1rem;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        outline: none;
+        margin-bottom: 2rem;
+    }
+
+    .example {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+        padding: 1rem;
+        text-align: center;
+    }
+
+    .example img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+    }
+
+    .show-solution {
+        display: inline-block;
+        margin-top: 1rem;
+        padding: 0.6rem 1.2rem;
+        background-color: #1e88e5;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background-color 0.2s ease;
+    }
+
+    .show-solution:hover {
+        background-color: #1565c0;
+    }
+
+    /* Překryv pro řešení */
+    .overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.7);
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .overlay-content {
+        background: white;
+        border-radius: 10px;
+        padding: 1rem;
+        max-width: 90%;
+        max-height: 90%;
+        position: relative;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    .overlay-content img {
+        max-width: 100%;
+        max-height: 80vh;
+        border-radius: 8px;
+    }
+
+    .close-btn {
+        position: absolute;
+        top: 8px;
+        right: 12px;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #333;
+    }
+
+    .close-btn:hover {
+        color: #1e88e5;
+    }
+</style>
 </head>
 <body>
+<header>
+    <h1>Příklady a řešení</h1>
+</header>
 
-<div id="protected-content">
-  <h1>Vítej na chráněném webu!</h1>
-  <p>Tento obsah uvidí jen přihlášení uživatelé.</p>
-  <button id="logout">Odhlásit se</button>
+<div class="container">
+    <label for="serie">Vyber sérii:</label>
+    <select id="serie">
+        <option value="">-- vyber --</option>
+        <option value="A">Série A</option>
+        <option value="B">Série B</option>
+        <option value="C">Série C</option>
+    </select>
+
+    <div id="examples"></div>
+</div>
+
+<!-- Překryv pro zobrazení řešení -->
+<div class="overlay" id="overlay">
+    <div class="overlay-content">
+        <span class="close-btn" id="closeBtn">&times;</span>
+        <img id="solutionImage" src="" alt="Řešení">
+    </div>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  // Inicializace Netlify Identity
-  netlifyIdentity.init();
+    const series = {
+        A: [1, 2, 5],
+        B: [3, 4],
+        C: [2, 3, 4, 5]
+    };
 
-  function checkLogin(user) {
-    if(user) {
-      document.getElementById('protected-content').style.display = 'block';
-    } else {
-      netlifyIdentity.open(); // otevře login
-    }
-  }
+    const select = document.getElementById('serie');
+    const examplesDiv = document.getElementById('examples');
+    const overlay = document.getElementById('overlay');
+    const solutionImage = document.getElementById('solutionImage');
+    const closeBtn = document.getElementById('closeBtn');
 
-  // Po inicializaci
-  netlifyIdentity.on('init', checkLogin);
+    select.addEventListener('change', () => {
+        const value = select.value;
+        examplesDiv.innerHTML = '';
 
-  // Po přihlášení
-  netlifyIdentity.on('login', user => {
-    document.getElementById('protected-content').style.display = 'block';
-  });
+        if (!value) return;
 
-  // Logout
-  document.getElementById('logout').addEventListener('click', () => {
-    netlifyIdentity.logout();
-    document.getElementById('protected-content').style.display = 'none';
-    netlifyIdentity.open();
-  });
-});
+        series[value].forEach(num => {
+            const div = document.createElement('div');
+            div.classList.add('example');
+
+            div.innerHTML = `
+                <img src="data/${num}.png" alt="Příklad ${num}">
+                <br>
+                <button class="show-solution" data-num="${num}">Řešení</button>
+            `;
+
+            examplesDiv.appendChild(div);
+        });
+
+        // Přidání funkcionality pro tlačítka Řešení
+        document.querySelectorAll('.show-solution').forEach(button => {
+            button.addEventListener('click', e => {
+                const num = e.target.getAttribute('data-num');
+                solutionImage.src = `data/${num}_res.png`;
+                overlay.style.display = 'flex';
+            });
+        });
+    });
+
+    // Zavření překryvu
+    overlay.addEventListener('click', e => {
+        if (e.target === overlay || e.target === closeBtn) {
+            overlay.style.display = 'none';
+        }
+    });
 </script>
-
 </body>
 </html>
