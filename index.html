@@ -5,15 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Příklady a řešení</title>
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-<script>
-  netlifyIdentity.init();
-
-  const user = netlifyIdentity.currentUser();
-  if (!user) {
-    // Přesměrování na login widget
-    netlifyIdentity.open(); 
-  }
-</script>
 <style>
     body {
         font-family: "Segoe UI", sans-serif;
@@ -195,6 +186,22 @@
         }
     });
 </script>
+<script>
+  // Inicializace Netlify Identity
+  netlifyIdentity.init();
+
+  // Získání aktuálního uživatele
+  const user = netlifyIdentity.currentUser();
+
+  // Pokud není přihlášen, otevře se login formulář
+  if (!user) {
+    netlifyIdentity.open(); // otevře login/signup okno
+  } else {
+    // Uživatel je přihlášen – můžeš načíst obsah
+    console.log("Přihlášený uživatel:", user.email);
+  }
+</script>
 </body>
 </html>
+
 
