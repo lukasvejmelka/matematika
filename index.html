@@ -5,37 +5,42 @@
   <title>Chráněný web</title>
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
   <style>
-    /* Obsah stránky je skrytý, dokud se nepřihlásíš */
     #protected-content { display: none; }
   </style>
 </head>
 <body>
-  <div id="protected-content">
-    <h1>Vítej na chráněném webu!</h1>
-    <p>Tento obsah uvidí jen přihlášení uživatelé.</p>
-    <button id="logout">Odhlásit se</button>
-  </div>
 
-  <script>
-    // Inicializace Netlify Identity
-    netlifyIdentity.init();
+<div id="protected-content">
+  <h1>Vítej na chráněném webu!</h1>
+  <p>Obsah uvidí jen přihlášení uživatelé.</p>
+  <button id="logout">Odhlásit se</button>
+</div>
 
-    // Kontrola přihlášení
-    netlifyIdentity.on('init', user => {
-      if(user) {
-        document.getElementById('protected-content').style.display = 'block';
-      } else {
-        // Otevře login widget
-        netlifyIdentity.open();
-      }
-    });
+<script>
+  // Inicializace Netlify Identity hned po načtení skriptu
+  netlifyIdentity.init();
 
-    // Logout
-    document.getElementById('logout').addEventListener('click', () => {
-      netlifyIdentity.logout();
-      document.getElementById('protected-content').style.display = 'none';
+  // Funkce pro kontrolu přihlášení
+  function checkLogin() {
+    const user = netlifyIdentity.currentUser();
+    if (user) {
+      document.getElementById('protected-content').style.display = 'block';
+    } else {
+      // otevře login okno
       netlifyIdentity.open();
-    });
-  </script>
+    }
+  }
+
+  // počkáme na načtení widgetu
+  netlifyIdentity.on('init', checkLogin);
+
+  // logout
+  document.getElementById('logout').addEventListener('click', () => {
+    netlifyIdentity.logout();
+    document.getElementById('protected-content').style.display = 'none';
+    netlifyIdentity.open();
+  });
+</script>
+
 </body>
 </html>
