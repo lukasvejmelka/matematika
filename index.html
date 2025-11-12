@@ -2,41 +2,53 @@
 <html lang="cs">
 <head>
   <meta charset="UTF-8">
-  <title>Chráněný web</title>
+  <title>Chráněný web – Minimal Example Lamo</title>
+  <!-- Netlify Identity Widget -->
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
   <style>
-    #protected-content { display: none; }
+    /* Obsah je skrytý, dokud se uživatel nepřihlásí */
+    #protected-content { display: none; font-family: sans-serif; padding: 20px; }
+    body { text-align: center; padding-top: 50px; font-family: sans-serif; }
+    button { margin-top: 20px; padding: 8px 16px; }
   </style>
 </head>
 <body>
 
 <div id="protected-content">
   <h1>Vítej na chráněném webu!</h1>
-  <p>Obsah uvidí jen přihlášení uživatelé.</p>
+  <p>Tento obsah uvidí jen přihlášení uživatelé.</p>
   <button id="logout">Odhlásit se</button>
 </div>
 
-<!-- Tady vlož JS kód -->
 <script>
-netlifyIdentity.init();
+  // Inicializace Netlify Identity
+  netlifyIdentity.init();
 
-netlifyIdentity.on('init', user => {
-  if (!user) {
-    netlifyIdentity.open(); // otevře login pro nepřihlášené
-  } else {
-    document.getElementById('protected-content').style.display = 'block';
+  // Funkce pro kontrolu přihlášení
+  function checkLogin(user) {
+    if(user) {
+      // uživatel přihlášený → zobraz obsah
+      document.getElementById('protected-content').style.display = 'block';
+    } else {
+      // nepřihlášený → otevře login widget
+      netlifyIdentity.open();
+    }
   }
-});
 
-netlifyIdentity.on('login', () => {
-  document.getElementById('protected-content').style.display = 'block';
-});
+  // Po inicializaci widgetu
+  netlifyIdentity.on('init', checkLogin);
 
-document.getElementById('logout').addEventListener('click', () => {
-  netlifyIdentity.logout();
-  document.getElementById('protected-content').style.display = 'none';
-  netlifyIdentity.open();
-});
+  // Po přihlášení zobraz obsah
+  netlifyIdentity.on('login', user => {
+    document.getElementById('protected-content').style.display = 'block';
+  });
+
+  // Odhlášení
+  document.getElementById('logout').addEventListener('click', () => {
+    netlifyIdentity.logout();
+    document.getElementById('protected-content').style.display = 'none';
+    netlifyIdentity.open();
+  });
 </script>
 
 </body>
