@@ -2,11 +2,9 @@
 <html lang="cs">
 <head>
   <meta charset="UTF-8">
-  <title>Chráněný web – Minimal Example Lamo</title>
-  <!-- Netlify Identity Widget -->
+  <title>Chráněný web – Minimal Example - Rýma</title>
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
   <style>
-    /* Obsah je skrytý, dokud se uživatel nepřihlásí */
     #protected-content { display: none; font-family: sans-serif; padding: 20px; }
     body { text-align: center; padding-top: 50px; font-family: sans-serif; }
     button { margin-top: 20px; padding: 8px 16px; }
@@ -21,34 +19,33 @@
 </div>
 
 <script>
+document.addEventListener('DOMContentLoaded', () => {
   // Inicializace Netlify Identity
   netlifyIdentity.init();
 
-  // Funkce pro kontrolu přihlášení
   function checkLogin(user) {
     if(user) {
-      // uživatel přihlášený → zobraz obsah
       document.getElementById('protected-content').style.display = 'block';
     } else {
-      // nepřihlášený → otevře login widget
-      netlifyIdentity.open();
+      netlifyIdentity.open(); // otevře login
     }
   }
 
-  // Po inicializaci widgetu
+  // Po inicializaci
   netlifyIdentity.on('init', checkLogin);
 
-  // Po přihlášení zobraz obsah
+  // Po přihlášení
   netlifyIdentity.on('login', user => {
     document.getElementById('protected-content').style.display = 'block';
   });
 
-  // Odhlášení
+  // Logout
   document.getElementById('logout').addEventListener('click', () => {
     netlifyIdentity.logout();
     document.getElementById('protected-content').style.display = 'none';
     netlifyIdentity.open();
   });
+});
 </script>
 
 </body>
