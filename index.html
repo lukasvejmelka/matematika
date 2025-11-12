@@ -16,30 +16,27 @@
   <button id="logout">Odhlásit se</button>
 </div>
 
+<!-- Tady vlož JS kód -->
 <script>
-  // Inicializace Netlify Identity hned po načtení skriptu
-  netlifyIdentity.init();
+netlifyIdentity.init();
 
-  // Funkce pro kontrolu přihlášení
-  function checkLogin() {
-    const user = netlifyIdentity.currentUser();
-    if (user) {
-      document.getElementById('protected-content').style.display = 'block';
-    } else {
-      // otevře login okno
-      netlifyIdentity.open();
-    }
+netlifyIdentity.on('init', user => {
+  if (!user) {
+    netlifyIdentity.open(); // otevře login pro nepřihlášené
+  } else {
+    document.getElementById('protected-content').style.display = 'block';
   }
+});
 
-  // počkáme na načtení widgetu
-  netlifyIdentity.on('init', checkLogin);
+netlifyIdentity.on('login', () => {
+  document.getElementById('protected-content').style.display = 'block';
+});
 
-  // logout
-  document.getElementById('logout').addEventListener('click', () => {
-    netlifyIdentity.logout();
-    document.getElementById('protected-content').style.display = 'none';
-    netlifyIdentity.open();
-  });
+document.getElementById('logout').addEventListener('click', () => {
+  netlifyIdentity.logout();
+  document.getElementById('protected-content').style.display = 'none';
+  netlifyIdentity.open();
+});
 </script>
 
 </body>
