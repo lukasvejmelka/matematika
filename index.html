@@ -51,7 +51,7 @@
         }
 
         .logo {
-            max-width: 60px;
+            max-width: 120px;
             height: auto;
             flex-shrink: 0;
         }
@@ -1433,21 +1433,27 @@
 
         if (document.documentElement.requestFullscreen) {
             document.documentElement.requestFullscreen().then(() => {
+                // Po úspěšném vstupu do fullscreenu se pokusíme uzamknout orientaci
+                if (screen.orientation && screen.orientation.lock) {
+                    screen.orientation.lock('landscape').catch(err => {
+                        console.warn("Nepodařilo se uzamknout orientaci obrazovky na landscape:", err);
+                        // Upozornění uživatele, pokud je to nutné, ale často je to jen omezení prohlížeče
+                    });
+                } else {
+                    console.warn("Screen Orientation API není podporováno nebo lock() není k dispozici.");
+                }
                 prepareProblemForFullscreen(problemElement);
-                // activeProblemElement je nastaven uvnitř prepareProblemForFullscreen
                 // updateProgressBar je volán uvnitř setTimeout v prepareProblemForFullscreen
             }).catch(err => {
                 console.error(`Chyba při pokusu o přepnutí do režimu celé obrazovky: ${err.message}`);
-                // Pokud fullscreen selže, stále připravíme problém pro zobrazení
+                // Pokud fullscreen selže, st\u00e1le p\u0159iprav\u00edme probl\u00e9m pro zobrazen\u00ed
                 prepareProblemForFullscreen(problemElement);
-                // activeProblemElement je nastaven uvnitř prepareProblemForFullscreen
-                // updateProgressBar je volán uvnitř setTimeout v prepareProblemForFullscreen
-                hideFullscreenNavArrows(); // Skryjeme šipky a počítadlo, pokud fullscreen selhal
+                // updateProgressBar je vol\u00e1n uvnit\u0159 setTimeout v prepareProblemForFullscreen
+                hideFullscreenNavArrows(); // Skryjeme \u0161ipky a po\u010d\u00edtadlo, pokud fullscreen selhal
             });
         } else {
             alert("Váš prohlížeč nepodporuje režim celé obrazovky.");
             prepareProblemForFullscreen(problemElement);
-            // activeProblemElement je nastaven uvnitř prepareProblemForFullscreen
             // updateProgressBar je volán uvnitř setTimeout v prepareProblemForFullscreen
             hideFullscreenNavArrows(); // Skryjeme šipky a počítadlo, pokud fullscreen není podporován
         }
@@ -1545,6 +1551,11 @@
             activeProblemElement = null; // Reset aktivního problému při opuštění fullscreenu
             hideFullscreenNavArrows(); // Skryjeme šipky a počítadlo
             updateProgressBar(); // Aktualizujeme progress bar pro normální režim
+
+            // Odemkneme orientaci obrazovky
+            if (screen.orientation && screen.orientation.unlock) {
+                screen.orientation.unlock();
+            }
 
             // Pokud existuje čekající požadavek na fullscreen, nyní je čas ho splnit
             if (pendingFullscreenRequest) {
