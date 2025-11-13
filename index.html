@@ -994,15 +994,18 @@
             shuffleArray(filteredProblems);
         }
 
-        currentDisplayedProblems = filteredProblems;
+        // Nyní přidáme displayIndex ke každému problému
+        currentDisplayedProblems = filteredProblems.map((problem, i) => ({
+            ...problem,
+            displayIndex: i + 1
+        }));
 
         // Zobrazování příkladů
-        let index = 1;
-        currentDisplayedProblems.forEach(({ series, num }) => {
+        currentDisplayedProblems.forEach(({ series, num, displayIndex }) => {
             const problemDiv = document.createElement("div");
             problemDiv.className = "problem";
             problemDiv.innerHTML = `
-                <div class="problem-number">Příklad ${index}</div>
+                <div class="problem-number">Příklad ${displayIndex}</div>
                 <div class="problem-id">ID: ${series}/${num}</div>
                 <img src="files/${series}/${num}.png" alt="Úloha ${num}" />
                 <br>
@@ -1010,7 +1013,6 @@
                 <button class="place-button" onclick="handlePlaceButtonClick(event, '${series}', ${num})">Místo</button>
             `;
             problemsDiv.appendChild(problemDiv);
-            index++;
         });
 
         problemCountDiv.textContent = `Počet příkladů: ${currentDisplayedProblems.length}`;
@@ -1040,6 +1042,7 @@
         }
 
         // Pokud nejsou načteny žádné problémy, načteme je nejprve na základě aktuálních filtrů
+        // loadProblems() nyní zajistí, že každý problém má displayIndex
         if (currentDisplayedProblems.length === 0) {
             loadProblems();
         }
@@ -1047,8 +1050,9 @@
         let rangedProblems = [];
         // Rozsah se aplikuje na vizuální index (Příklad 1, Příklad 2, atd.)
         for (let i = 0; i < currentDisplayedProblems.length; i++) {
-            if ((i + 1) >= rangeFrom && (i + 1) <= rangeTo) {
-                rangedProblems.push(currentDisplayedProblems[i]);
+            // Použijeme existující displayIndex pro porovnání
+            if (currentDisplayedProblems[i].displayIndex >= rangeFrom && currentDisplayedProblems[i].displayIndex <= rangeTo) {
+                rangedProblems.push(currentDisplayedProblems[i]); // Přidáme celý objekt, včetně jeho displayIndex
             }
         }
 
@@ -1060,12 +1064,11 @@
         currentDisplayedProblems = rangedProblems; // Aktualizujeme currentDisplayedProblems na problémy v rozsahu
 
         // Zobrazování problémů
-        let index = 1;
-        currentDisplayedProblems.forEach(({ series, num }) => {
+        currentDisplayedProblems.forEach(({ series, num, displayIndex }) => { // Použijeme displayIndex
             const problemDiv = document.createElement("div");
             problemDiv.className = "problem";
             problemDiv.innerHTML = `
-                <div class="problem-number">Příklad ${index}</div>
+                <div class="problem-number">Příklad ${displayIndex}</div>
                 <div class="problem-id">ID: ${series}/${num}</div>
                 <img src="files/${series}/${num}.png" alt="Úloha ${num}" />
                 <br>
@@ -1073,7 +1076,6 @@
                 <button class="place-button" onclick="handlePlaceButtonClick(event, '${series}', ${num})">Místo</button>
             `;
             problemsDiv.appendChild(problemDiv);
-            index++;
         });
 
         document.getElementById("problemCount").textContent = `Počet příkladů: ${currentDisplayedProblems.length}`;
@@ -1115,12 +1117,13 @@
             document.getElementById("rangeTo").value = '';
             document.getElementById("randomOrderCheckbox").checked = false;
 
-            currentDisplayedProblems = [foundProblem]; // Nastavíme pouze nalezený problém
+            // Nastavíme pouze nalezený problém s displayIndex 1
+            currentDisplayedProblems = [{ ...foundProblem, displayIndex: 1 }];
 
             const problemDiv = document.createElement("div");
             problemDiv.className = "problem";
             problemDiv.innerHTML = `
-                <div class="problem-number">Příklad 1</div>
+                <div class="problem-number">Příklad ${currentDisplayedProblems[0].displayIndex}</div>
                 <div class="problem-id">ID: ${foundProblem.series}/${foundProblem.num}</div>
                 <img src="files/${foundProblem.series}/${foundProblem.num}.png" alt="Úloha ${foundProblem.num}" />
                 <br>
@@ -1173,7 +1176,7 @@
 
         solutionImage.src = `files/${series}/${num}_res.png`;
         // Aktualizujeme innerHTML pro možnost stylování části textu
-        overlayTitle.innerHTML = `Řešení <span class="problem-index-bold">příkladu ${currentProblemIndex + 1}</span> ID: ${series}/${num}`;
+        overlayTitle.innerHTML = `Řešení <span class="problem-index-bold">příkladu ${currentDisplayedProblems[currentProblemIndex].displayIndex}</span> ID: ${series}/${num}`;
         overlay.style.display = "flex";
 
         // Aktualizujeme stav navigačních tlačítek
@@ -1446,10 +1449,10 @@
                 // updateProgressBar je volán uvnitř setTimeout v prepareProblemForFullscreen
             }).catch(err => {
                 console.error(`Chyba při pokusu o přepnutí do režimu celé obrazovky: ${err.message}`);
-                // Pokud fullscreen selže, st\u00e1le p\u0159iprav\u00edme probl\u00e9m pro zobrazen\u00ed
+                // Pokud fullscreen selže, stále připravíme problém pro zobrazení
                 prepareProblemForFullscreen(problemElement);
-                // updateProgressBar je vol\u00e1n uvnit\u0159 setTimeout v prepareProblemForFullscreen
-                hideFullscreenNavArrows(); // Skryjeme \u0161ipky a po\u010d\u00edtadlo, pokud fullscreen selhal
+                // updateProgressBar je volán uvnitř setTimeout v prepareProblemForFullscreen
+                hideFullscreenNavArrows(); // Skryjeme šipky a počítadlo, pokud fullscreen selhal
             });
         } else {
             alert("Váš prohlížeč nepodporuje režim celé obrazovky.");
@@ -1476,7 +1479,9 @@
             prevArrow.disabled = currentProblemIndex <= 0;
         }
         if (problemCounter) {
-            problemCounter.textContent = `${currentProblemIndex + 1}/${allProblems.length}`;
+            // Použijeme displayIndex z activeProblemElement pro aktuální číslo
+            const currentDisplayIndex = activeProblemElement ? parseInt(activeProblemElement.querySelector('.problem-number').textContent.replace('Příklad ', '')) : 0;
+            problemCounter.textContent = `${currentDisplayIndex}/${currentDisplayedProblems.length}`;
             problemCounter.style.display = 'block';
         }
     }
