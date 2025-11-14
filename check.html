@@ -61,7 +61,7 @@
             border-radius: 8px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
             padding: 1rem;
-            margin-top: 1rem; /* Space from advanced options button */
+            margin-top: 0.5rem; /* Space from input row */
             margin-bottom: 1.5rem;
             display: none; /* Hidden by default */
         }
@@ -84,10 +84,10 @@
             margin-bottom: 1rem;
         }
 
-        .search-input-row { /* New flex container for input and clear button */
+        .search-input-row { /* New flex container for input, clear, and settings button */
             display: flex;
             align-items: center;
-            margin-bottom: 0.5rem; /* Space between input row and Potvrdit button */
+            margin-bottom: 0.5rem; /* Space between input row and hint/error */
         }
 
         .search-input-row input {
@@ -113,43 +113,30 @@
             font-size: 1.2rem;
             flex-shrink: 0; /* Prevent button from shrinking */
             transition: background-color 0.2s ease;
+            margin-right: 0.5rem; /* Space before cog button */
         }
 
         .clear-input-button:hover {
             background-color: #d32f2f; /* Darker red on hover */
         }
 
-        .search-input-group > button { /* Target the Potvrdit button directly */
-            padding: 0.5rem 1rem;
-            background-color: #1e88e5;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-            width: 100%; /* Make Potvrdit button full width */
-        }
-
-        .search-input-group > button:hover {
-            background-color: #1565c0;
-        }
-
-        .advanced-options-button {
-            display: block;
-            width: 100%;
-            padding: 0.5rem 1rem;
+        .settings-cog-button {
             background-color: #607d8b; /* Grey color */
             color: white;
             border: none;
             border-radius: 6px;
             cursor: pointer;
+            width: 38px; /* Fixed width for square button */
+            height: 38px; /* Fixed height for square button */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0; /* Prevent button from shrinking */
             transition: background-color 0.2s ease;
-            margin-top: 0.5rem; /* Space from Potvrdit button */
-            margin-bottom: 1rem;
-            font-size: 0.9rem;
         }
 
-        .advanced-options-button:hover {
+        .settings-cog-button:hover {
             background-color: #455a64;
         }
 
@@ -250,11 +237,11 @@
             background-color: #37474F; /* Darker color for solution box */
             color: white;
             cursor: pointer;
-            display: none; /* Managed by JS */
+            /* display: none; Managed by JS */
         }
 
         .solution-image {
-            display: none; /* Managed by JS */
+            /* display: none; Managed by JS */
             margin-top: 1rem;
             max-width: 100%;
             border-radius: 8px;
@@ -267,7 +254,18 @@
             font-size: 0.9rem;
             color: gray;
             margin-top: 0.5rem;
+            margin-bottom: 0.5rem; /* Added margin for spacing */
+            display: block; /* Ensure it's a block element */
         }
+
+        .error-message {
+            color: red;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+            display: none; /* Hidden by default */
+        }
+
         .problem img {
             max-width: 100%;
             height: auto;
@@ -329,13 +327,10 @@
             .search-input-row input {
                 margin-right: 0.5rem;
             }
-            .clear-input-button {
+            .clear-input-button, .settings-cog-button {
                 width: 36px; /* Slightly smaller on mobile */
                 height: 36px;
                 font-size: 1.1rem;
-            }
-            .search-input-group > button {
-                width: 100%;
             }
             .qr-button {
                 font-size: 0.95rem;
@@ -345,7 +340,7 @@
                 width: 90%;
                 font-size: 75%;
             }
-            .hint {
+            .hint, .error-message {
                 font-size: 0.8rem;
             }
             #qrCameraIcon {
@@ -397,25 +392,28 @@
                 placeholder="Zadejte ID příkladu (např. 2023-leto/3)"
             />
             <button class="clear-input-button" id="clearSearchButton" onclick="clearSearchInput()" style="display: none;">&#x2715;</button>
+            <button class="settings-cog-button" id="settingsCogButton" onclick="toggleAdvancedOptions()">
+                <i class="fas fa-cog"></i>
+            </button>
         </div>
-        <button onclick="searchById()">Potvrdit</button>
-        <button onclick="toggleAdvancedOptions()" class="advanced-options-button" id="advancedOptionsButton">Rozšířené možnosti</button>
-        <div class="hint">Nápověda: Zadejte ID ve formátu "2023-leto/3".</div>
+        <div class="hint" id="hintText">Nápověda: Zadejte ID ve formátu "2023-leto/3".</div>
+        <div class="error-message" id="notFoundMessage" style="display: none;">Neexistující ID</div>
     </div>
 
     <div class="settings-group" id="settingsGroup">
-        <h2>Nastavení</h2>
         <label>
             <input type="checkbox" id="spoilerCheckbox" checked onchange="handleSpoilerToggle()">
             Spoilování výsledku (zobrazit řešení automaticky)
         </label>
     </div>
 
-    <div class="solution-box" id="solutionBox" onclick="toggleSolution()">
-        Výsledek
+    <div id="problemDisplayArea" style="display: none;">
+        <div class="solution-box" id="solutionBox" onclick="toggleSolution()">
+            Výsledek
+        </div>
+        <div class="problem-solution"><img id="solutionImage" src="" alt="Řešení" class="solution-image"></div>
+        <div class="problem-list"><div class="problem" id="problem"></div></div>
     </div>
-    <div class="problem-solution"><img id="solutionImage" src="" alt="Řešení" class="solution-image"></div>
-    <div class="problem-list"><div class="problem" id="problem"></div></div>
 
 </div>
 
@@ -441,13 +439,16 @@
     const qrScannerToggleButton = document.getElementById('qrScannerToggleButton');
     const searchIdInput = document.getElementById("searchId");
     const clearSearchButton = document.getElementById("clearSearchButton");
+    const settingsCogButton = document.getElementById("settingsCogButton"); // New cog button element
     const problemDiv = document.getElementById("problem");
     const solutionBox = document.getElementById("solutionBox");
     const solutionImage = document.getElementById("solutionImage");
     const spoilerCheckbox = document.getElementById("spoilerCheckbox");
     const qrCameraIcon = document.getElementById("qrCameraIcon");
     const settingsGroup = document.getElementById("settingsGroup");
-    const advancedOptionsButton = document.getElementById("advancedOptionsButton");
+    const notFoundMessage = document.getElementById("notFoundMessage");
+    const hintText = document.getElementById("hintText");
+    const problemDisplayArea = document.getElementById("problemDisplayArea");
 
     function loadAllProblems() {
         for (const series in problemsCount) {
@@ -459,26 +460,40 @@
 
     function clearSearchInput() {
         searchIdInput.value = '';
-        clearSearchButton.style.display = 'none'; // Hide button after clearing
-        searchIdInput.focus(); // Keep focus on input
-    }
-
-    function searchById() {
-        const searchInput = searchIdInput.value.trim();
+        searchIdInput.style.fontWeight = 'normal';
+        searchIdInput.style.color = 'initial';
+        clearSearchButton.style.display = 'none';
+        notFoundMessage.style.display = 'none';
+        hintText.style.display = 'block'; // Show hint when empty
         problemDiv.innerHTML = '';
         solutionBox.style.display = 'none';
         solutionImage.style.display = 'none';
-        qrCameraIcon.style.display = 'none'; // Hide camera icon until problem is found
+        qrCameraIcon.style.display = 'none';
+        problemDisplayArea.style.display = 'none'; // Hide problem display area
+        searchIdInput.focus(); // Keep focus on input
+    }
+
+    function searchById(problemToDisplay = null) {
+        const searchInput = searchIdInput.value.trim();
+        let problem = problemToDisplay;
+
+        if (!problem) { // If not passed (e.g., from QR scan), find it
+            const [series, numStr] = searchInput.split('/');
+            const num = parseInt(numStr);
+            problem = allProblems.find(p => p.series === series && p.num === num);
+        }
+
+        // Clear previous display
+        problemDiv.innerHTML = '';
+        solutionBox.style.display = 'none';
+        solutionImage.style.display = 'none';
+        qrCameraIcon.style.display = 'none';
+        problemDisplayArea.style.display = 'none'; // Hide wrapper initially
 
         // Stop QR scanner if active
         if (qrCodeScanner) {
             stopQrScanner();
         }
-
-        const [series, numStr] = searchInput.split('/');
-        const num = parseInt(numStr);
-
-        const problem = allProblems.find(p => p.series === series && p.num === num);
 
         if (problem) {
             problemDiv.innerHTML = `
@@ -488,7 +503,9 @@
                 </div>
             `;
             solutionBox.style.display = 'block';
+            solutionImage.src = `files/${problem.series}/${problem.num}_res.png`;
             qrCameraIcon.style.display = 'flex'; // Show camera icon
+            problemDisplayArea.style.display = 'block'; // Show the wrapper
 
             // Apply spoiler setting
             if (spoilerCheckbox.checked) {
@@ -496,14 +513,16 @@
             } else {
                 solutionImage.style.display = 'none';
             }
-            solutionImage.src = `files/${series}/${num}_res.png`;
 
             // Scroll to solution box
             solutionBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
         } else {
+            // This else block should ideally not be reached if searchById is only called for exact matches
+            // But as a fallback, ensure everything is hidden and show a message if needed
             problemDiv.innerHTML = '<p>Žádný příklad nenalezen. Zkontrolujte formát ID (např. 2023-leto/3).</p>';
-            qrCameraIcon.style.display = 'none'; // Ensure camera icon is hidden if no problem
+            qrCameraIcon.style.display = 'none';
+            problemDisplayArea.style.display = 'block'; // Show wrapper to display "not found" message
         }
     }
 
@@ -524,10 +543,10 @@
     function toggleAdvancedOptions() {
         if (settingsGroup.style.display === 'none' || settingsGroup.style.display === '') {
             settingsGroup.style.display = 'block';
-            advancedOptionsButton.textContent = 'Skrýt rozšířené možnosti';
+            settingsCogButton.style.backgroundColor = '#455a64'; // Darker grey when open
         } else {
             settingsGroup.style.display = 'none';
-            advancedOptionsButton.textContent = 'Rozšířené možnosti';
+            settingsCogButton.style.backgroundColor = '#607d8b'; // Original grey when closed
         }
     }
 
@@ -535,7 +554,8 @@
     function onScanSuccess(decodedText, decodedResult) {
         console.log(`QR kód úspěšně naskenován: ${decodedText}`);
         searchIdInput.value = decodedText;
-        searchById();
+        // Manually trigger the 'input' event to apply all the new logic
+        searchIdInput.dispatchEvent(new Event('input'));
         // The scanner will be stopped by searchById() if successful, putting it in standby.
     }
 
@@ -631,26 +651,86 @@
         const id = urlParams.get('id');
         if (id) {
             searchIdInput.value = id;
-            searchById();
+            // Manually trigger the 'input' event to apply all the new logic
+            searchIdInput.dispatchEvent(new Event('input'));
         }
     }
 
-    getIdFromUrl();
+    // Toggle clear button visibility and handle input validation/display
+    searchIdInput.addEventListener("input", function() {
+        const currentInput = searchIdInput.value.trim();
 
-    // Přidání události pro Enter
-    searchIdInput.addEventListener("keydown", function(event) {
-        if (event.key === 'Enter') {
-            searchById();
+        // Always hide previous problem/solution when input changes, unless it's an exact match
+        problemDiv.innerHTML = '';
+        solutionBox.style.display = 'none';
+        solutionImage.style.display = 'none';
+        qrCameraIcon.style.display = 'none';
+        problemDisplayArea.style.display = 'none'; // Hide the wrapper
+
+        if (currentInput.length === 0) {
+            searchIdInput.style.fontWeight = 'normal';
+            searchIdInput.style.color = 'initial';
+            clearSearchButton.style.display = 'none';
+            notFoundMessage.style.display = 'none';
+            hintText.style.display = 'block'; // Show hint when empty
+            return; // Exit early
+        }
+
+        clearSearchButton.style.display = 'flex'; // Show clear button if input is not empty
+
+        let exactMatch = false;
+        let partialMatch = false;
+        let foundProblem = null;
+
+        for (const problem of allProblems) {
+            const problemId = `${problem.series}/${problem.num}`;
+            if (problemId === currentInput) {
+                exactMatch = true;
+                foundProblem = problem;
+                break;
+            }
+            if (problemId.startsWith(currentInput)) {
+                partialMatch = true;
+            }
+        }
+
+        if (exactMatch) {
+            searchIdInput.style.fontWeight = 'bold';
+            searchIdInput.style.color = '#4CAF50'; // Green color
+            notFoundMessage.style.display = 'none';
+            hintText.style.display = 'none'; // Hide hint
+            // Automatically call searchById for exact match
+            searchById(foundProblem); // Pass the found problem to avoid re-finding
+        } else if (partialMatch) {
+            searchIdInput.style.fontWeight = 'normal';
+            searchIdInput.style.color = 'initial';
+            notFoundMessage.style.display = 'none';
+            hintText.style.display = 'block'; // Keep hint visible for partial match
+        } else {
+            searchIdInput.style.fontWeight = 'bold'; // Make text bold
+            searchIdInput.style.color = 'red'; // Make text red
+            notFoundMessage.style.display = 'block'; // Show "neexistující ID"
+            hintText.style.display = 'none'; // Hide hint
         }
     });
 
-    // Toggle clear button visibility based on input content
-    searchIdInput.addEventListener("input", function() {
-        if (searchIdInput.value.length > 0) {
-            clearSearchButton.style.display = 'flex'; // Show as flex to center content
+    // Initial page load logic
+    window.addEventListener('DOMContentLoaded', (event) => {
+        // Ensure problem display area is hidden on initial load
+        problemDisplayArea.style.display = 'none';
+
+        // Also hide the notFoundMessage and ensure hint is visible if input is empty
+        notFoundMessage.style.display = 'none';
+        if (searchIdInput.value.length === 0) {
+            hintText.style.display = 'block';
         } else {
-            clearSearchButton.style.display = 'none';
+            hintText.style.display = 'none';
+            // If there's initial value (e.g., from browser autofill), trigger input event
+            searchIdInput.dispatchEvent(new Event('input'));
         }
+
+        // Call getIdFromUrl to process any ID in the URL
+        getIdFromUrl();
     });
 </script>
 </body>
