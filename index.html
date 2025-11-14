@@ -51,7 +51,7 @@
         }
 
         .logo {
-            max-width: 120px;
+            max-width: 60px;
             height: auto;
             flex-shrink: 0;
         }
@@ -801,7 +801,7 @@
         <div class="select-group">
             <label for="series">Vyberte sérii:</label>
             <select id="series" multiple size="6" onchange="loadProblems()">
-                <option value="2023-leto">2023 - Léto</option>
+                <option value="16j">2016 jaro</option>
                 <option value="2023-podzim">2023 - Podzim</option>
                 <option value="2024-leto">2024 - Léto</option>
                 <option value="2025-podzim">2025 - Podzim</option>
@@ -864,7 +864,7 @@
 
 <script>
     const problemsCount = {
-        "2023-leto": 3,
+        "16j": 25,
         "2023-podzim": 3,
         "2024-leto": 3,
         "2025-podzim": 3,
@@ -874,22 +874,22 @@
 
     const topics = {
         "geometrie": {
-            "2023-leto": [1, 3],
+            "16j": [1, 3],
             "2023-podzim": [2, 3],
             "vzorove-ulohy": [1]
         },
         "posloupnosti": {
-            "2023-leto": [2],
+            "16j": [2],
             "2023-podzim": [1],
             "vzorove-ulohy": [2]
         },
         "rovnice": {
-            "2024-leto": [1, 2],
+            "16j": [1, 2],
             "2025-podzim": [1],
             "ilustracni-test": [1]
         },
         "vyrazy": {
-            "2024-leto": [3],
+            "16j": [3],
             "2025-podzim": [2],
             "ilustracni-test": [2]
         }
