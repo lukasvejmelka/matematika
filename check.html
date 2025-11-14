@@ -259,7 +259,7 @@
         }
 
         .error-message {
-            color: red;
+            color: gray; /* Changed from red to gray */
             font-size: 0.9rem;
             margin-top: 0.5rem;
             margin-bottom: 0.5rem;
@@ -708,9 +708,21 @@
             hintText.style.display = 'block'; // Keep hint visible for partial match
         } else {
             searchIdInput.style.fontWeight = 'bold'; // Make text bold
-            searchIdInput.style.color = 'red'; // Make text red
+            searchIdInput.style.color = 'red'; // Keep text red for invalid input
             notFoundMessage.style.display = 'block'; // Show "neexistující ID"
             hintText.style.display = 'none'; // Hide hint
+        }
+    });
+
+    // Handle Enter key press for keyboard dismissal and scrolling
+    searchIdInput.addEventListener("keydown", function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // Prevent default form submission if any
+            searchIdInput.blur(); // Dismiss the virtual keyboard
+            // Trigger the input event logic to handle validation and display
+            searchIdInput.dispatchEvent(new Event('input'));
+            // Scroll the input field into view after processing
+            searchIdInput.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     });
 
