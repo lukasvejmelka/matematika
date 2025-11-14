@@ -6,9 +6,9 @@
     <title>Vyhledávání podle ID</title>
     <link rel="stylesheet">
     <style>
-	html {
-  	     overflow-y: scroll;
-	}
+        html {
+            overflow-y: scroll;
+        }
         body {
             font-family: "Segoe UI", sans-serif;
             background-color: #f5f7fa;
@@ -55,6 +55,10 @@
             padding: 0 1rem;
         }
 
+        .search-input-group {
+            margin-bottom: 1rem;
+        }
+
         .search-input {
             display: flex;
             align-items: center;
@@ -84,6 +88,37 @@
             background-color: #1565c0;
         }
 
+        .qr-button {
+            display: block;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background-color: #4CAF50; /* Green color */
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .qr-button:hover {
+            background-color: #45a049;
+        }
+
+        #qr-reader {
+            width: 100%;
+            max-width: 400px; /* Limit QR reader width */
+            margin: 0 auto 1rem auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        #qr-reader__dashboard_section_csr {
+            padding: 10px;
+        }
+
         .problem {
             background: white;
             border-radius: 6px;
@@ -93,8 +128,8 @@
         }
         .problem-solution {
             background: white;
-            border-radius:   0 0 6px 6px;
-	    border-color: #1e88e5;
+            border-radius: 0 0 6px 6px;
+            border-color: #1e88e5;
             box-shadow: 0 2px 6px rgba(0,0,0,0.3);
             margin-bottom: 1rem;
             padding: 0.5rem;
@@ -104,8 +139,8 @@
 
         .problem-list {
             background: white;
-            border-radius:   10px;
-	    border-color: #1e88e5;
+            border-radius: 10px;
+            border-color: #1e88e5;
             box-shadow: 0 2px 6px rgba(0,0,0,0.3);
             margin-bottom: 1rem;
             padding: 0.5rem;
@@ -113,48 +148,113 @@
             text-align: center;
         }
 
-	.problem-id {
+        .problem-id {
             box-shadow: 0 0 6px 0px rgba(0,0,0,0.3);
-	    border-left: none;
+            border-left: none;
             margin-bottom: 0.2rem; margin-top: 2rem; padding: 0.4rem;
-   	    width: 70%; 
-            display: block; /* Zajištění, že obrázek je blokový prvek */
-            margin-left: auto; /* Zarovnání na střed */
-            margin-right: auto; /* Zarovnání na střed */
-	    font-size: 80%;
+            width: 70%;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            font-size: 80%;
         }
         .solution-box {
-            border: 0px solid rgba(0,0,0,0.1); /* Tmavší odstín modré */
+            border: 0px solid rgba(0,0,0,0.1);
             border-radius: 6px 6px 0 0 ;
             padding: 0.6rem;
             margin-top: 1rem;
-            background-color: #1e88e5; /* Tmavší odstín modré */
+            background-color: #1e88e5;
             color: white;
             cursor: pointer;
-            display: none; /* Skryté, dokud se neklikne na tlačítko */
+            display: none;
         }
 
         .solution-image {
-            display: none; /* Skryté, dokud se neklikne na tlačítko */
+            display: none;
             margin-top: 1rem;
             max-width: 100%;
             border-radius: 8px;
-            display: block; /* Zajištění, že obrázek je blokový prvek */
-            margin-left: auto; /* Zarovnání na střed */
-            margin-right: auto; /* Zarovnání na střed */
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .hint {
             font-size: 0.9rem;
             color: gray;
             margin-top: 0.5rem;
-	}
-    	.problem img {
-	max-width: 100%;
-	height: auto;
+        }
+        .problem img {
+            max-width: 100%;
+            height: auto;
         }
 
+        /* --- Responsive Styles --- */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                text-align: center;
+                padding: 0.75rem;
+            }
+            .logo {
+                max-width: 120px;
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+            h1 {
+                font-size: 1.8rem;
+                margin-bottom: 10px;
+            }
+            .back-link {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.9rem;
+            }
+            .container {
+                margin: 1.5rem auto;
+                padding: 0 0.75rem;
+            }
+            .search-input {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .search-input input {
+                margin-right: 0;
+                margin-bottom: 0.5rem;
+            }
+            .search-input button {
+                width: 100%;
+            }
+            .qr-button {
+                font-size: 0.95rem;
+                padding: 0.6rem 1rem;
+            }
+            .problem-id {
+                width: 90%;
+                font-size: 75%;
+            }
+            .hint {
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+            .logo {
+                max-width: 100px;
+            }
+            .container {
+                margin: 1rem auto;
+                padding: 0 0.5rem;
+            }
+            .problem-id {
+                width: 95%;
+                font-size: 70%;
+            }
+        }
     </style>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 </head>
 <body>
 <header>
@@ -164,16 +264,23 @@
 </header>
 
 <div class="container">
-    <div class="search-input">
-    <input 
-        type="text" 
-        id="searchId" 
-        placeholder="Zadejte ID příkladu (např. 2023-leto/3)" 
-        onclick="this.value='';"
-    />
-    <button onclick="searchById()">Potvrdit</button>
+    <button onclick="toggleQrScanner()" class="qr-button" id="qrScannerToggleButton">Načíst podle QR kódu</button>
+
+    <div id="qr-reader" style="display: none;"></div>
+    <button id="stopQrButton" onclick="stopQrScanner()" style="display: none; margin-top: 10px;" class="qr-button">Zavřít čtečku</button>
+
+    <div class="search-input-group" id="manualSearchGroup">
+        <div class="search-input">
+            <input
+                type="text"
+                id="searchId"
+                placeholder="Zadejte ID příkladu (např. 2023-leto/3)"
+                onclick="this.value='';"
+            />
+            <button onclick="searchById()">Potvrdit</button>
+        </div>
+        <div class="hint">Nápověda: Zadejte ID ve formátu "2023-leto/3".</div>
     </div>
-    <div class="hint">Nápověda: Zadejte ID ve formátu "2023-leto/3".</div>
 
     <div class="solution-box" id="solutionBox" onclick="toggleSolution()">
         Klepni na mě a ukážu ti řešení
@@ -194,6 +301,7 @@
     };
 
     let allProblems = []; // Uložíme všechny příklady pro pozdější filtrování
+    let qrCodeScanner = null; // Instance QR čtečky
 
     function loadAllProblems() {
         for (const series in problemsCount) {
@@ -204,7 +312,7 @@
     }
 
     function searchById() {
-        const searchInput = document.getElementById("searchId").value;
+        const searchInput = document.getElementById("searchId").value.trim();
         const problemDiv = document.getElementById("problem");
         const solutionBox = document.getElementById("solutionBox");
         const solutionImage = document.getElementById("solutionImage");
@@ -221,13 +329,13 @@
             problemDiv.innerHTML = `
                 <div class="problem">
                     <img src="files/${problem.series}/${problem.num}.png" alt="Úloha ${problem.num}" />
-		    <div class="problem-id">Příklad s ID: ${problem.series}/${problem.num}</div>
+                    <div class="problem-id">Příklad s ID: ${problem.series}/${problem.num}</div>
                 </div>
             `;
             solutionBox.style.display = 'block'; // Zobrazíme rámeček pro řešení
             solutionImage.src = `files/${series}/${num}_res.png`; // Nastavíme zdroj obrázku řešení
         } else {
-            problemDiv.innerHTML = '<p>Žádný příklad nenalezen.</p>';
+            problemDiv.innerHTML = '<p>Žádný příklad nenalezen. Zkontrolujte formát ID (např. 2023-leto/3).</p>';
         }
     }
 
@@ -236,8 +344,75 @@
         solutionImage.style.display = solutionImage.style.display === 'none' ? 'block' : 'none'; // Přepínání zobrazení obrázku
     }
 
+    // --- QR Scanner Functions ---
+    function onScanSuccess(decodedText, decodedResult) {
+        console.log(`QR kód úspěšně naskenován: ${decodedText}`);
+        document.getElementById("searchId").value = decodedText;
+        searchById();
+        // Optionally, you can stop the scanner after a successful scan if you only want one scan at a time.
+        // For continuous scanning, leave the scanner running.
+    }
+
+    function onScanError(errorMessage) {
+        // console.warn(`Chyba při skenování QR kódu: ${errorMessage}`);
+        // Můžete zde zobrazit chybu uživateli, pokud je to nutné
+    }
+
+    function toggleQrScanner() {
+        const qrReaderDiv = document.getElementById('qr-reader');
+        const stopQrBtn = document.getElementById('stopQrButton');
+        const manualSearchGroup = document.getElementById('manualSearchGroup');
+        const qrScannerToggleButton = document.getElementById('qrScannerToggleButton');
+
+        if (qrCodeScanner === null) {
+            // Start QR scanner
+            qrCodeScanner = new Html5QrcodeScanner(
+                "qr-reader",
+                { fps: 10, qrbox: {width: 250, height: 250} },
+                /* verbose= */ false
+            );
+            qrCodeScanner.render(onScanSuccess, onScanError);
+
+            qrReaderDiv.style.display = 'block';
+            stopQrBtn.style.display = 'block';
+            manualSearchGroup.style.display = 'none';
+            qrScannerToggleButton.textContent = 'Zavřít čtečku (QR)'; // Change button text
+            qrScannerToggleButton.style.backgroundColor = '#f44336'; // Red color for close
+        } else {
+            // Stop QR scanner
+            stopQrScanner();
+        }
+    }
+
+    function stopQrScanner() {
+        const qrReaderDiv = document.getElementById('qr-reader');
+        const stopQrBtn = document.getElementById('stopQrButton');
+        const manualSearchGroup = document.getElementById('manualSearchGroup');
+        const qrScannerToggleButton = document.getElementById('qrScannerToggleButton');
+
+        if (qrCodeScanner) {
+            qrCodeScanner.clear().then(() => {
+                qrCodeScanner = null;
+                qrReaderDiv.style.display = 'none';
+                stopQrBtn.style.display = 'none';
+                manualSearchGroup.style.display = 'block';
+                qrScannerToggleButton.textContent = 'Načíst podle QR kódu'; // Reset button text
+                qrScannerToggleButton.style.backgroundColor = '#4CAF50'; // Reset button color
+            }).catch((err) => {
+                console.error("Failed to clear html5QrcodeScanner. ", err);
+                // Even if clear fails, try to reset UI
+                qrCodeScanner = null;
+                qrReaderDiv.style.display = 'none';
+                stopQrBtn.style.display = 'none';
+                manualSearchGroup.style.display = 'block';
+                qrScannerToggleButton.textContent = 'Načíst podle QR kódu';
+                qrScannerToggleButton.style.backgroundColor = '#4CAF50';
+            });
+        }
+    }
+
     loadAllProblems();
-    
+
     // Zpracování ID z URL
     function getIdFromUrl() {
         const urlParams = new URLSearchParams(window.location.search);
