@@ -41,6 +41,7 @@
             gap: 1rem;
             /* Přidáme padding-top, aby header nebyl pod progress barem */
             padding-top: calc(1rem + 5px); /* 1rem + výška progress baru */
+            position: relative; /* Needed for projection button to be positioned relative to it */
         }
 
         .logo-link { /* New style for logo link */
@@ -74,11 +75,68 @@
             font-size: 0.9rem;
             text-align: center;
             min-width: 160px;
+            min-height: 48px; /* Ensure consistent height */
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .search-link:hover {
             background-color: #0d47a1;
         }
+
+        /* New projection button style - fixed position */
+        .projection-button {
+            position: fixed; /* Fixed position */
+            left: 20px; /* Changed from right to left */
+            z-index: 10001; /* Above everything else except fullscreen arrows/counter */
+            background-color: #607d8b; /* Opaque grey */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1rem; /* Match search-link padding */
+            font-size: 0.9rem; /* Match search-link font size */
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 48px; /* Ensure good touch target */
+            min-height: 48px; /* Match search-link height */
+        }
+
+        .projection-button:hover {
+            background-color: #455a64;
+        }
+
+        /* New fullscreen exit button style */
+        #exitFullscreenButton {
+            position: fixed;
+            top: 1rem; /* Fixed to top-right */
+            right: 1rem; /* Fixed to top-right */
+            left: auto; /* Reset left */
+            z-index: 10003; /* Above projection button and other fullscreen UI */
+            background-color: #ef5350; /* Softer red (Material Design Red 400) */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem 0.75rem; /* Smaller padding */
+            font-size: 0.8rem; /* Smaller font size */
+            cursor: pointer;
+            transition: background-color 0.2s ease, opacity 0.2s ease;
+            display: none; /* Hidden by default */
+            align-items: center;
+            justify-content: center;
+            min-width: 32px; /* Smaller min-width */
+            min-height: 32px; /* Smaller min-height */
+            opacity: 0.6; /* Partially transparent */
+        }
+
+        #exitFullscreenButton:hover {
+            background-color: #e53935; /* Darker red on hover */
+            opacity: 1; /* Fully opaque on hover */
+        }
+
 
         .container {
             max-width: 900px;
@@ -240,13 +298,91 @@
             margin-bottom: 2rem;
             padding: 1.5rem;
             text-align: center;
+            position: relative; /* Needed for fullscreen positioning */
+            display: block; /* Ensure it's a block element */
         }
 
+        /* Ensure images fit within their container */
         .problem img {
             max-width: 100%;
             height: auto;
+            display: block; /* Prevents extra space below image */
+            margin: 0 auto; /* Center image */
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        /* Styles for fullscreen problem */
+        .problem.fullscreen-active {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: auto; /* Allow scrolling within the problem */
+            z-index: 9999; /* Ensure it's on top */
+            background: white;
+            padding: 1rem;
+            border-radius: 0; /* No rounded corners in fullscreen */
+            box-shadow: none; /* No shadow in fullscreen */
+            margin-bottom: 0;
+            display: grid; /* Change to grid */
+            grid-template-columns: max-content 1fr; /* Left column for header, right for image */
+            grid-template-rows: 1fr; /* Single row */
+            align-items: start; /* Align items to the top */
+            gap: 1rem; /* Space between columns */
+        }
+
+        .problem-header-content { /* Wrapper for button and info */
+            display: flex;
+            flex-direction: column; /* Stack items vertically */
+            align-items: flex-start; /* Align to start */
+            width: 100%; /* Take full width */
+            margin-bottom: 0; /* No margin below in fullscreen */
+            gap: 0.5rem; /* Smaller gap */
+            grid-column: 1; /* Place in the first column */
+            grid-row: 1; /* Place in the first row */
+            padding-top: 1rem; /* Initial padding, adjusted by exit button */
+        }
+
+        .problem-info-text { /* Wrapper for problem number/ID */
+            text-align: left; /* Default alignment */
+            flex-grow: 0; /* Don't grow, let it wrap */
+            width: 100%; /* Take full width of its parent flex item */
+            order: 1; /* Place at the top */
+        }
+
+        .problem.fullscreen-active .problem-number,
+        .problem.fullscreen-active .problem-id {
+            text-align: left; /* Align text to the left in fullscreen header */
+            margin: 0; /* Remove default margins */
+        }
+
+        .problem.fullscreen-active .show-solution {
+            order: 2; /* Place below problem-info-text */
+            position: static; /* Reset position from absolute */
+            margin-top: 0; /* Remove default margin-top */
+            width: auto; /* Allow button to size naturally */
+            max-width: none; /* Remove max-width constraint */
+            align-self: flex-start; /* Align to the start of the cross axis */
+            flex-shrink: 0; /* Prevent shrinking */
+            padding: 0.75rem 1rem; /* Adjust padding for smaller button in fullscreen header */
+            font-size: 0.9rem; /* Adjust font size */
+            min-height: 40px; /* Smaller min-height */
+        }
+
+        .problem.fullscreen-active img {
+            grid-column: 2; /* Place in the second column */
+            grid-row: 1; /* Place in the first row */
+            max-width: 100%;
+            max-height: 100%; /* Fill available height */
+            object-fit: contain;
+            margin: 0; /* Remove auto margin */
+        }
+
+        /* Class to hide problems when one is in fullscreen */
+        .problem.hidden-for-fullscreen {
+            display: none !important;
         }
 
         .problem-number {
@@ -267,7 +403,7 @@
 
         .show-solution {
             display: inline-block;
-            margin-top: 1.5rem;
+            margin-top: 0; /* Remove default margin for normal mode, handled by flexbox */
             padding: 1rem 2rem;
             background-color: #1e88e5;
             color: white;
@@ -285,50 +421,32 @@
             background-color: #1565c0;
         }
 
-        /* New style for the "Místo" button */
-        .place-button {
-            display: inline-block;
-            margin-top: 1.5rem; /* Align with show-solution button */
-            padding: 1rem 2rem;
-            background-color: #607d8b; /* Subtle grey/blue */
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.2s ease;
-            min-height: 48px;
-            width: 100%;
-            max-width: 300px;
-            margin-left: 1rem; /* Space from solution button */
-        }
-
-        .place-button:hover {
-            background-color: #455a64;
-        }
-
         .overlay {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            top: 50%; /* Center vertically */
+            left: 50%; /* Center horizontally */
+            transform: translate(-50%, -50%); /* Adjust for its own size */
             background-color: rgba(0, 0, 0, 0.8);
             justify-content: center;
             align-items: center;
-            z-index: 1000;
+            z-index: 10004; /* Higher than fullscreen UI */
             padding: 1rem;
+            max-width: 90vw; /* Limit width */
+            max-height: 90vh; /* Limit height */
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            cursor: default; /* Default cursor for the whole overlay */
+            transition: all 0.2s ease; /* Add transition for smooth movement when not dragging */
         }
 
         .overlay-content {
             background: white;
             border-radius: 10px;
             padding: 0;
-            max-width: calc(95% - 120px); /* Adjust for nav arrows */
-            max-height: 95%;
+            max-width: 100%; /* Fill overlay container */
+            max-height: 100%; /* Fill overlay container */
             position: relative;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -341,6 +459,7 @@
             padding: 1rem;
             background-color: #f8f9fa;
             border-bottom: 1px solid #e0e0e0;
+            cursor: grab; /* Cursor for draggable header */
         }
 
         .overlay-header h3 {
@@ -436,6 +555,7 @@
             right: 10px;
         }
 
+
         /* Checkbox group styling */
         .checkbox-group {
             margin-bottom: 1rem;
@@ -480,20 +600,74 @@
             color: #333;
         }
 
+        .id-search-group .input-wrapper { /* New wrapper for input and clear button */
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
         .id-search-group input[type="text"] {
-            width: 180px; /* Zmenšená šířka */
+            flex-grow: 0; /* Prevent input from growing */
+            max-width: 180px; /* Limit width to approximately one-third of 900px container / 2 (for mobile) */
+            width: 100%; /* Ensure it takes full width up to max-width */
             padding: 0.75rem;
             border-radius: 8px;
             border: 2px solid #e0e0e0;
             outline: none;
             font-size: 1rem;
+            transition: border-color 0.2s ease, color 0.2s ease;
         }
 
         .id-search-group input[type="text"]:focus {
             border-color: #1e88e5;
         }
 
-        .id-search-group button {
+        /* New styles for ID input validation feedback */
+        .id-search-group input[type="text"].valid-id {
+            border-color: #4CAF50;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        .id-search-group input[type="text"].invalid-id {
+            border-color: #e53935;
+            font-weight: bold;
+            color: #e53935;
+        }
+
+        /* New style for the clear ID input button */
+        .clear-id-input-button {
+            background-color: #e53935; /* Explicitly red */
+            color: white;
+            border: none;
+            border-radius: 8px; /* Match other buttons */
+            width: 48px; /* Square button */
+            height: 48px; /* Square button */
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .clear-id-input-button:hover {
+            background-color: #c62828;
+        }
+
+        /* New style for ID help text */
+        .id-help-text {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 0.5rem;
+            flex-basis: 100%;
+        }
+        .id-help-text.error {
+            color: #e53935;
+            font-weight: bold;
+        }
+
+        .id-search-group button { /* This targets the "Zobrazit" button */
             padding: 0.75rem 1.5rem;
             background-color: #1e88e5;
             color: white;
@@ -520,14 +694,16 @@
             cursor: pointer;
             z-index: 10002; /* Above progress bar and overlay */
             display: none; /* Hidden by default */
-            transition: color 0.2s ease;
+            transition: opacity 0.3s ease; /* Smooth fade */
             padding: 10px 20px; /* Make it easier to click */
             background-color: rgba(255, 255, 255, 0.1); /* Slightly visible background */
             border-radius: 10px;
+            opacity: 1; /* Start visible, then fade */
         }
 
         .fullscreen-nav-arrow:hover:not(:disabled) {
-            color: #616161; /* Darker gray on hover */
+            background-color: rgba(0, 0, 0, 0.7);
+            transform: translateX(-50%) scale(1.1);
         }
 
         .fullscreen-nav-arrow:disabled {
@@ -560,6 +736,47 @@
             transition: opacity 0.3s ease;
         }
 
+        /* Fullscreen Timer */
+        #fullscreenTimer {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 10002; /* Same as arrows */
+            font-size: 1.8rem;
+            color: #9e9e9e;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 10px 15px;
+            border-radius: 10px;
+            display: none; /* Hidden by default */
+            user-select: none;
+            transition: opacity 0.3s ease;
+            opacity: 1; /* Start visible */
+        }
+        #fullscreenTimer.hidden {
+            opacity: 0;
+        }
+
+        /* Fullscreen Alert Overlay */
+        #fullscreenAlertOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: #e0e0e0; /* Grayish white */
+            font-size: 3rem;
+            display: none; /* Hidden by default */
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 10005; /* Above everything else */
+            pointer-events: none; /* Allow clicks to pass through by default */
+        }
+        #fullscreenAlertOverlay.active {
+            pointer-events: auto; /* Block clicks when active */
+        }
+
 
         /* Mobilní optimalizace */
         @media (max-width: 768px) {
@@ -585,6 +802,24 @@
                 width: 100%;
                 max-width: 280px;
                 margin-top: 0.5rem;
+            }
+
+            /* Adjust fixed projection button for mobile */
+            .projection-button {
+                left: 10px; /* Adjusted for mobile */
+                padding: 0.75rem 1rem; /* Adjusted padding for mobile */
+                font-size: 1.2rem; /* Adjusted font size for mobile */
+                min-width: 48px;
+                min-height: 48px;
+            }
+            #exitFullscreenButton {
+                top: 10px;
+                right: 10px; /* Adjusted for mobile */
+                left: auto; /* Reset left */
+                padding: 0.75rem 1rem;
+                font-size: 1.2rem;
+                min-width: 48px;
+                min-height: 48px;
             }
 
             .container {
@@ -627,16 +862,41 @@
                 font-size: 0.85rem;
             }
 
-            .show-solution, .place-button { /* Combined styles for mobile */
+            .show-solution {
                 width: 100%;
                 max-width: none;
                 margin-left: 0;
-                margin-top: 0.5rem; /* Keep them close */
-            }
-            .show-solution {
                 margin-top: 1rem; /* Separate from problem ID */
             }
 
+            .problem.fullscreen-active {
+                grid-template-columns: 1fr; /* Single column for mobile */
+                grid-template-rows: auto 1fr; /* Header then image */
+            }
+
+            .problem.fullscreen-active .problem-header-content {
+                position: static; /* Reset to static within grid */
+                grid-column: 1;
+                grid-row: 1;
+                width: 100%;
+                justify-content: flex-start;
+                gap: 0.5rem; /* Smaller gap for mobile */
+                flex-direction: column; /* Stack vertically */
+                align-items: flex-start;
+                padding-top: 40px; /* Space for the fixed exit button */
+            }
+
+            .problem.fullscreen-active .show-solution {
+                position: static; /* Reset to static within flex container */
+                padding: 0.5rem 0.75rem;
+                font-size: 0.8rem;
+                min-height: 36px;
+            }
+
+            .problem.fullscreen-active img {
+                grid-column: 1; /* Place in the first column */
+                grid-row: 2; /* Place in the second row */
+            }
 
             .overlay {
                 padding: 0.5rem;
@@ -684,8 +944,9 @@
             }
 
             .id-search-group input[type="text"] {
-                flex-basis: 100%; /* Input takes full width on small screens */
-                width: auto; /* Reset fixed width for mobile to allow flex-basis */
+                flex-basis: auto; /* Allow flex-grow to work */
+                flex-grow: 1; /* Input takes available space */
+                max-width: none; /* Remove max-width constraint on mobile */
             }
             .id-search-group button {
                 flex-basis: 100%; /* Button takes full width on small screens */
@@ -706,6 +967,12 @@
                 font-size: 1.4rem;
                 bottom: 15px;
                 right: 15px;
+                padding: 8px 12px;
+            }
+            #fullscreenTimer {
+                font-size: 1.4rem;
+                bottom: 15px;
+                left: 15px;
                 padding: 8px 12px;
             }
         }
@@ -757,6 +1024,12 @@
                 right: 10px;
                 padding: 6px 10px;
             }
+            #fullscreenTimer {
+                font-size: 1.2rem;
+                bottom: 10px;
+                left: 10px;
+                padding: 6px 10px;
+            }
         }
 
         /* Landscape mode na mobilech */
@@ -785,6 +1058,15 @@
     <a href="check.html" class="search-link" target="_blank">Vyhledávání podle ID</a>
 </header>
 
+<!-- Projection button moved outside header for fixed positioning -->
+<button class="projection-button" title="Zobrazit první viditelný příklad na celou obrazovku" onclick="toggleFullscreenForFirstVisibleProblem(event)">
+    &#128421; <!-- Presentation chart icon -->
+</button>
+<!-- Fullscreen exit button -->
+<button id="exitFullscreenButton" title="Ukončit režim celé obrazovky" onclick="exitFullscreen()">
+    &#x2716; <!-- Heavy multiplication x icon -->
+</button>
+
 <div class="container">
     <div class="filters-section">
         <!-- Změněné pořadí: Téma je nyní před Sérem -->
@@ -805,7 +1087,7 @@
                 <option value="2023-podzim">2023 - Podzim</option>
                 <option value="2024-leto">2024 - Léto</option>
                 <option value="2025-podzim">2025 - Podzim</option>
-                <option value="ilustracni-test">Ilustrační test</option>
+                <option value="ilustracni-test">Ilustracni test</option>
                 <option value="vzorove-ulohy">Vzorové úlohy</option>
             </select>
         </div>
@@ -833,9 +1115,12 @@
             <!-- Nová sekce pro vyhledávání podle ID -->
             <div class="id-search-group">
                 <label for="problemIdInput">Zobrazení příkladu s konkrétním ID:</label>
-                <input type="text" id="problemIdInput" placeholder="např. 2023-leto/1" list="problemIdDatalist" />
-                <datalist id="problemIdDatalist"></datalist>
-                <button id="showProblemByIdBtn" onclick="showProblemById()">Zobrazit</button>
+                <div class="input-wrapper">
+                    <input type="text" id="problemIdInput" placeholder="např. 2023-leto/1" />
+                    <button id="clearIdInputBtn" class="clear-id-input-button" title="Vyčistit ID vstup">&times;</button>
+                </div>
+                <div id="problemIdHelpText" class="id-help-text">Nápověda: Zadejte ID ve formátu "16j/12"</div>
+                <button id="showProblemByIdBtn" onclick="showProblemById(true)">Zobrazit</button>
             </div>
             <button class="clear-filter" onclick="clearFilters()">Vyčistit filtr</button>
         </div>
@@ -861,6 +1146,7 @@
 <div id="prevProblemArrow" class="fullscreen-nav-arrow" title="Předchozí příklad">&uarr;</div>
 <div id="nextProblemArrow" class="fullscreen-nav-arrow" title="Další příklad">&darr;</div>
 <div id="fullscreenProblemCounter"></div> <!-- Nový element pro počítadlo příkladů -->
+<div id="fullscreenTimer"></div> <!-- Nový element pro časovač -->
 
 <script>
     const problemsCount = {
@@ -898,14 +1184,36 @@
     let masterProblemList = []; // Obsahuje všechny možné problémy { series, num }
     let currentDisplayedProblems = []; // Obsahuje problémy aktuálně zobrazené v problemsDiv
 
-    let activeBlankSpaceDiv = null; // To keep track of the inserted blank space
-    let activeProblemElement = null; // To keep track of which problem has the blank space
-    let pendingFullscreenRequest = null; // To store the element for a pending fullscreen request
+    let activeProblemElement = null; // To keep track of which problem is in fullscreen
+    let lastScrollPosition = 0; // To store scroll position before fullscreen
 
     // Global variables for touch events
     let touchStartX = 0;
     let touchStartY = 0;
     const swipeThreshold = 50; // Minimum pixels for a swipe to register
+
+    // For overlay dragging
+    let isDraggingOverlay = false;
+    let overlayDragOffsetX, overlayDragOffsetY;
+    const overlay = document.getElementById("overlay");
+    const overlayContent = document.querySelector(".overlay-content");
+    const overlayHeader = document.querySelector(".overlay-header"); // Get the header for dragging
+
+    // For fullscreen arrow and timer auto-hide
+    let fullscreenUIHideTimeout;
+    const UI_HIDE_DELAY = 5000; // 5 seconds
+
+    // For fullscreen timer
+    let timerInterval;
+    let timerSeconds = 8100; // 135 minutes
+    let twoMinuteAlertShown = false;
+    let finalAlertShown = false;
+
+    const fullscreenTimerElement = document.getElementById('fullscreenTimer');
+    const fullscreenAlertOverlay = document.createElement('div');
+    fullscreenAlertOverlay.id = 'fullscreenAlertOverlay';
+    document.body.appendChild(fullscreenAlertOverlay);
+
 
     // Funkce pro zamíchání pole (Fisher-Yates shuffle)
     function shuffleArray(array) {
@@ -935,15 +1243,6 @@
             }
         }
         masterProblemList = Array.from(allPossibleProblems).map(item => JSON.parse(item));
-
-        // Naplníme datalist pro autokompletaci
-        const datalist = document.getElementById("problemIdDatalist");
-        datalist.innerHTML = ''; // Vyčistíme stávající možnosti
-        masterProblemList.forEach(problem => {
-            const option = document.createElement("option");
-            option.value = `${problem.series}/${problem.num}`;
-            datalist.appendChild(option);
-        });
     }
 
     function loadProblems() {
@@ -1004,18 +1303,29 @@
         currentDisplayedProblems.forEach(({ series, num, displayIndex }) => {
             const problemDiv = document.createElement("div");
             problemDiv.className = "problem";
+            problemDiv.setAttribute('data-series', series);
+            problemDiv.setAttribute('data-num', num);
             problemDiv.innerHTML = `
-                <div class="problem-number">Příklad ${displayIndex}</div>
-                <div class="problem-id">ID: ${series}/${num}</div>
+                <div class="problem-header-content">
+                    <div class="problem-info-text">
+                        <div class="problem-number">Příklad ${displayIndex}</div>
+                        <div class="problem-id">ID: ${series}/${num}</div>
+                    </div>
+                    <button class="show-solution" data-series="${series}" data-num="${num}">Zobrazit řešení</button>
+                </div>
                 <img src="files/${series}/${num}.png" alt="Úloha ${num}" />
-                <br>
-                <button class="show-solution" data-series="${series}" data-num="${num}" onclick="showSolution('${series}', ${num})">Zobrazit řešení</button>
-                <button class="place-button" onclick="handlePlaceButtonClick(event, '${series}', ${num})">Místo</button>
             `;
             problemsDiv.appendChild(problemDiv);
         });
 
         problemCountDiv.textContent = `Počet příkladů: ${currentDisplayedProblems.length}`;
+        // Attach event listeners to newly created "show-solution" buttons
+        document.querySelectorAll('.problem .show-solution').forEach(button => {
+            button.onclick = function(event) {
+                event.stopPropagation(); // Prevent click from bubbling up and closing overlay
+                showSolution(this.dataset.series, parseInt(this.dataset.num));
+            };
+        });
     }
 
     // Nová funkce pro načtení příkladů a posun na první z nich
@@ -1067,22 +1377,33 @@
         currentDisplayedProblems.forEach(({ series, num, displayIndex }) => { // Použijeme displayIndex
             const problemDiv = document.createElement("div");
             problemDiv.className = "problem";
+            problemDiv.setAttribute('data-series', series);
+            problemDiv.setAttribute('data-num', num);
             problemDiv.innerHTML = `
-                <div class="problem-number">Příklad ${displayIndex}</div>
-                <div class="problem-id">ID: ${series}/${num}</div>
+                <div class="problem-header-content">
+                    <div class="problem-info-text">
+                        <div class="problem-number">Příklad ${displayIndex}</div>
+                        <div class="problem-id">ID: ${series}/${num}</div>
+                    </div>
+                    <button class="show-solution" data-series="${series}" data-num="${num}">Zobrazit řešení</button>
+                </div>
                 <img src="files/${series}/${num}.png" alt="Úloha ${num}" />
-                <br>
-                <button class="show-solution" data-series="${series}" data-num="${num}" onclick="showSolution('${series}', ${num})">Zobrazit řešení</button>
-                <button class="place-button" onclick="handlePlaceButtonClick(event, '${series}', ${num})">Místo</button>
             `;
             problemsDiv.appendChild(problemDiv);
         });
 
         document.getElementById("problemCount").textContent = `Počet příkladů: ${currentDisplayedProblems.length}`;
+        // Attach event listeners to newly created "show-solution" buttons
+        document.querySelectorAll('.problem .show-solution').forEach(button => {
+            button.onclick = function(event) {
+                event.stopPropagation(); // Prevent click from bubbling up and closing overlay
+                showSolution(this.dataset.series, parseInt(this.dataset.num));
+            };
+        });
     }
 
     // Nová funkce pro zobrazení příkladu podle ID
-    function showProblemById() {
+    function showProblemById(autoScroll = false) {
         const problemIdInput = document.getElementById("problemIdInput");
         const problemsDiv = document.getElementById("problems");
         const problemCountDiv = document.getElementById("problemCount");
@@ -1090,20 +1411,26 @@
 
         const inputId = problemIdInput.value.trim();
         if (!inputId) {
-            alert("Prosím zadejte ID příkladu (např. 2023-leto/1).");
+            // If input is empty, just clear problems and return
+            currentDisplayedProblems = [];
+            problemCountDiv.textContent = `Počet příkladů: 0`;
             return;
         }
 
         const idParts = inputId.split('/');
         if (idParts.length !== 2) {
-            alert("Neplatný formát ID. Použijte formát 'série/číslo' (např. 2023-leto/1).");
+            // Invalid format, handled by validateProblemId
+            currentDisplayedProblems = [];
+            problemCountDiv.textContent = `Počet příkladů: 0`;
             return;
         }
         const series = idParts[0];
         const num = parseInt(idParts[1]);
 
         if (isNaN(num)) {
-            alert("Číslo příkladu musí být platné číslo.");
+            // Invalid number, handled by validateProblemId
+            currentDisplayedProblems = [];
+            problemCountDiv.textContent = `Počet příkladů: 0`;
             return;
         }
 
@@ -1122,26 +1449,37 @@
 
             const problemDiv = document.createElement("div");
             problemDiv.className = "problem";
+            problemDiv.setAttribute('data-series', foundProblem.series);
+            problemDiv.setAttribute('data-num', foundProblem.num);
             problemDiv.innerHTML = `
-                <div class="problem-number">Příklad ${currentDisplayedProblems[0].displayIndex}</div>
-                <div class="problem-id">ID: ${foundProblem.series}/${foundProblem.num}</div>
+                <div class="problem-header-content">
+                    <div class="problem-info-text">
+                        <div class="problem-number">Příklad ${currentDisplayedProblems[0].displayIndex}</div>
+                        <div class="problem-id">ID: ${foundProblem.series}/${foundProblem.num}</div>
+                    </div>
+                    <button class="show-solution" data-series="${foundProblem.series}" data-num="${foundProblem.num}">Zobrazit řešení</button>
+                </div>
                 <img src="files/${foundProblem.series}/${foundProblem.num}.png" alt="Úloha ${foundProblem.num}" />
-                <br>
-                <button class="show-solution" data-series="${foundProblem.series}" data-num="${foundProblem.num}" onclick="showSolution('${foundProblem.series}', ${foundProblem.num})">Zobrazit řešení</button>
-                <button class="place-button" onclick="handlePlaceButtonClick(event, '${foundProblem.series}', ${foundProblem.num})">Místo</button>
             `;
             problemsDiv.appendChild(problemDiv);
             problemCountDiv.textContent = `Počet příkladů: 1`;
 
-            // Posuneme se na zobrazený problém
-            if (problemsDiv.firstElementChild) {
+            // Posuneme se na zobrazený problém, pokud je autoScroll true
+            if (autoScroll && problemsDiv.firstElementChild) {
                 problemsDiv.firstElementChild.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         } else {
-            alert(`Příklad s ID '${inputId}' nebyl nalezen.`);
+            // This case should ideally be caught by validateProblemId before calling showProblemById
             currentDisplayedProblems = [];
             problemCountDiv.textContent = `Počet příkladů: 0`;
         }
+        // Attach event listeners to newly created "show-solution" buttons
+        document.querySelectorAll('.problem .show-solution').forEach(button => {
+            button.onclick = function(event) {
+                event.stopPropagation(); // Prevent click from bubbling up and closing overlay
+                showSolution(this.dataset.series, parseInt(this.dataset.num));
+            };
+        });
     }
 
     function clearFilters() {
@@ -1150,7 +1488,7 @@
         const rangeFrom = document.getElementById("rangeFrom");
         const rangeTo = document.getElementById("rangeTo");
         const randomOrderCheckbox = document.getElementById("randomOrderCheckbox");
-        const problemIdInput = document.getElementById("problemIdInput"); // Nový element
+        const problemIdInput = document.getElementById("problemIdInput");
 
         // Resetování výběrů
         seriesSelect.selectedIndex = -1;
@@ -1158,14 +1496,30 @@
         rangeFrom.value = '';
         rangeTo.value = '';
         randomOrderCheckbox.checked = false; // Reset checkboxu
-        problemIdInput.value = ''; // Vyčistíme ID input
+        
+        // Clear ID input and reset its state
+        problemIdInput.value = '';
+        problemIdInput.classList.remove('valid-id', 'invalid-id');
+        document.getElementById("problemIdHelpText").textContent = 'Nápověda: Zadejte ID ve formátu "16j/12"';
+        document.getElementById("problemIdHelpText").classList.remove('error');
 
         // Načtení příkladů po vyčištění filtrů (což by mělo vést k prázdnému zobrazení)
         loadProblemsAndScroll();
     }
 
+    // Function to close the overlay and reset its position
+    function closeOverlay() {
+        overlay.style.display = "none";
+        overlay.style.left = '50%';
+        overlay.style.top = '50%';
+        overlay.style.transform = 'translate(-50%, -50%)';
+        overlayHeader.style.cursor = 'grab'; // Reset cursor
+        // Reset overlay size to default when closed
+        overlay.style.width = '';
+        overlay.style.height = '';
+    }
+
     function showSolution(series, num) {
-        const overlay = document.getElementById("overlay");
         const solutionImage = document.getElementById("solutionImage");
         const overlayTitle = document.getElementById("overlayTitle");
         const prevBtn = document.getElementById("prevBtn");
@@ -1173,6 +1527,11 @@
 
         // Najdeme index aktuálního problému v currentDisplayedProblems
         currentProblemIndex = currentDisplayedProblems.findIndex(p => p.series === series && p.num === num);
+
+        if (currentProblemIndex === -1) {
+            console.error("Problem not found in currentDisplayedProblems for solution display:", series, num);
+            return; // Exit if problem not found
+        }
 
         solutionImage.src = `files/${series}/${num}_res.png`;
         // Aktualizujeme innerHTML pro možnost stylování části textu
@@ -1200,16 +1559,23 @@
         }
     }
 
-    // Zavření překryvu - only close if clicking on the backdrop
-    document.getElementById("overlay").addEventListener("click", function(e) {
-        if (e.target === this) { // Check if the click target is the overlay itself
-            this.style.display = "none";
+    // Event listeners for overlay closing
+    document.getElementById("closeBtn").addEventListener("click", closeOverlay);
+
+    // Click on the backdrop (overlay itself) or inside overlayContent (but not header)
+    overlay.addEventListener("click", function(e) {
+        // If the click is on the overlay backdrop OR on the overlay content itself (but not the header)
+        if (e.target === this || (e.target.closest('.overlay-content') && !e.target.closest('.overlay-header'))) {
+            closeOverlay();
         }
     });
 
-    // Zavření přes tlačítko
-    document.getElementById("closeBtn").addEventListener("click", function() {
-        document.getElementById("overlay").style.display = "none";
+    // Document-wide click listener for closing overlay if click is outside the entire overlay
+    document.addEventListener('click', function(e) {
+        // Check if the overlay is visible AND the click target is NOT inside the overlay
+        if (overlay.style.display === 'flex' && !overlay.contains(e.target)) {
+            closeOverlay();
+        }
     });
 
     // Event listenery pro navigační tlačítek
@@ -1228,7 +1594,7 @@
                 navigateSolution('next');
             } else if (e.key === "Escape") {
                 e.preventDefault();
-                overlay.style.display = "none";
+                closeOverlay();
             }
         }
     });
@@ -1260,13 +1626,7 @@
     document.getElementById("rangeTo").addEventListener("focus", function() {
         this.value = '';
     });
-    // Nový event listener pro problemIdInput
-    document.getElementById("problemIdInput").addEventListener("focus", function() {
-        if (this.value !== '') { // Vyčistí pouze pokud není prázdné
-            this.value = '';
-        }
-    });
-
+    
     // Potvrzení rozsahu stisknutím Enter
     document.getElementById("rangeFrom").addEventListener("keydown", function(e) {
         if (e.key === "Enter") {
@@ -1280,39 +1640,86 @@
             applyRange();
         }
     });
-    // Nový event listener pro problemIdInput pro Enter
-    document.getElementById("problemIdInput").addEventListener("keydown", function(e) {
+
+    // --- New/Modified ID Search Logic ---
+    const problemIdInput = document.getElementById("problemIdInput");
+    const problemIdHelpText = document.getElementById("problemIdHelpText");
+    const clearIdInputBtn = document.getElementById("clearIdInputBtn");
+
+    function validateProblemId() {
+        const inputId = problemIdInput.value.trim();
+        problemIdInput.classList.remove('valid-id', 'invalid-id');
+        problemIdHelpText.classList.remove('error');
+        problemIdHelpText.textContent = 'Nápověda: Zadejte ID ve formátu "16j/12"';
+
+        if (inputId === '') {
+            // If input is empty, reset and return
+            currentDisplayedProblems = []; // Clear displayed problems
+            document.getElementById("problems").innerHTML = '';
+            document.getElementById("problemCount").textContent = `Počet příkladů: 0`;
+            return;
+        }
+
+        const exactMatch = masterProblemList.find(p => `${p.series}/${p.num}` === inputId);
+        const prefixMatch = masterProblemList.some(p => `${p.series}/${p.num}`.startsWith(inputId));
+
+        if (exactMatch) {
+            problemIdInput.classList.add('valid-id');
+            showProblemById(true); // Automatically display and scroll on exact match
+        } else if (prefixMatch) {
+            // It's a valid prefix, but not an exact match yet
+            // Keep default help text, no special styling
+        } else {
+            // No prefix or exact match found
+            problemIdInput.classList.add('invalid-id');
+            problemIdHelpText.textContent = 'Neexistující ID';
+            problemIdHelpText.classList.add('error');
+            currentDisplayedProblems = []; // Clear displayed problems
+            document.getElementById("problems").innerHTML = '';
+            document.getElementById("problemCount").textContent = `Počet příkladů: 0`;
+        }
+    }
+
+    function clearProblemIdInput() {
+        problemIdInput.value = '';
+        validateProblemId(); // Reset state
+    }
+
+    problemIdInput.addEventListener('input', validateProblemId);
+    problemIdInput.addEventListener('keydown', function(e) {
         if (e.key === "Enter") {
             e.preventDefault();
-            showProblemById();
+            // If there's an exact match, showProblemById already scrolled.
+            // If not, but user presses enter, try to show it and scroll.
+            showProblemById(true);
         }
     });
+    clearIdInputBtn.addEventListener('click', clearProblemIdInput);
+    // --- End New/Modified ID Search Logic ---
+
 
     // Funkce pro aktualizaci progress baru
     function updateProgressBar() {
         const progressBar = document.getElementById("progressBar");
         const filtersSection = document.querySelector(".filters-section");
         const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-        const clientHeight = window.innerHeight; // Použijeme window.innerHeight pro aktuální výšku viewportu
+        const clientHeight = window.innerHeight;
 
         // --- Logika pro fullscreen režim "Místo" ---
-        if (document.fullscreenElement && activeProblemElement && activeBlankSpaceDiv) {
-            progressBar.style.opacity = '1'; // Vždy viditelný v tomto režimu
+        if (document.fullscreenElement && activeProblemElement && activeProblemElement.classList.contains('fullscreen-active')) {
+            progressBar.style.opacity = '1';
 
-            // Vypočítáme průběh posouvání vzhledem k prázdnému prostoru
-            // Prázdný prostor začíná hned za activeProblemElement
-            const blankSpaceStartOffset = activeProblemElement.offsetTop + activeProblemElement.offsetHeight;
-            const scrollProgressInBlankSpace = scrollTop - blankSpaceStartOffset;
-
-            // Celková výška prázdného prostoru je jeho aktuální výška
-            const totalBlankSpaceHeight = activeBlankSpaceDiv.offsetHeight;
+            const problemScrollTop = activeProblemElement.scrollTop;
+            const problemScrollHeight = activeProblemElement.scrollHeight;
+            const problemClientHeight = activeProblemElement.clientHeight;
 
             let scrollPercentage = 0;
-            if (totalBlankSpaceHeight > 0) {
-                scrollPercentage = (scrollProgressInBlankSpace / totalBlankSpaceHeight) * 100;
+            if (problemScrollHeight > problemClientHeight) {
+                scrollPercentage = (problemScrollTop / (problemScrollHeight - problemClientHeight)) * 100;
+            } else {
+                scrollPercentage = 100; // If problem fits, it's "100% scrolled"
             }
 
-            // Omezíme procenta mezi 0 a 100
             scrollPercentage = Math.max(0, Math.min(100, scrollPercentage));
             progressBar.style.width = `${scrollPercentage}%`;
             return; // Ukončíme, protože jsme zpracovali fullscreen režim
@@ -1349,157 +1756,156 @@
 
     // Funkce pro přípravu problému pro zobrazení na celou obrazovku
     function prepareProblemForFullscreen(problemElement) {
-        // 1. Odstraníme jakýkoli existující prázdný prostor před vložením nového
-        if (activeBlankSpaceDiv && activeBlankSpaceDiv.parentNode) {
-            activeBlankSpaceDiv.parentNode.removeChild(activeBlankSpaceDiv);
-            activeBlankSpaceDiv = null;
-        }
-        // Také resetujeme activeProblemElement, pokud byl nastaven (pro případ, že se měníme z jednoho problému na druhý)
+        const allProblems = document.querySelectorAll('.problem');
+
+        // Hide all problems first
+        allProblems.forEach(p => p.classList.add('hidden-for-fullscreen'));
+
+        // Remove fullscreen-active from any previously active problem
         if (activeProblemElement && activeProblemElement !== problemElement) {
-            activeProblemElement = null; // Resetujeme referenci
+            activeProblemElement.classList.remove('fullscreen-active');
         }
 
-        // 2. Vytvoříme a vložíme prázdný prostor
-        const blankSpaceDiv = document.createElement('div');
-        blankSpaceDiv.id = 'fullscreenBlankSpace';
-        // Prázdný prostor by měl mít vždy výšku jedné obrazovky
-        blankSpaceDiv.style.height = `${window.innerHeight}px`;
-        blankSpaceDiv.style.backgroundColor = 'transparent'; // Průhledné pozadí
-        blankSpaceDiv.style.pointerEvents = 'none'; // Neblokuje kliknutí
-        blankSpaceDiv.style.userSelect = 'none'; // Neumožňuje výběr textu
-        blankSpaceDiv.style.flexShrink = '0'; // Zabrání zmenšování v flex kontejnerech
+        // Set the new active problem and show it
+        activeProblemElement = problemElement;
+        activeProblemElement.classList.remove('hidden-for-fullscreen'); // Ensure it's visible
+        activeProblemElement.classList.add('fullscreen-active'); // Add fullscreen class
 
-        // Vložíme hned za aktuální problém
-        problemElement.parentNode.insertBefore(blankSpaceDiv, problemElement.nextSibling);
+        // Scroll to the top of the problem in fullscreen mode
+        activeProblemElement.scrollTop = 0;
 
-        activeBlankSpaceDiv = blankSpaceDiv;
-        activeProblemElement = problemElement; // Uložíme si referenci na aktuální problém
-
-        // 3. Posuneme vybraný problém na začátek obrazovky.
-        // Toto zajistí, že příklad je viditelný na horním okraji viewportu.
-        problemElement.scrollIntoView({ behavior: 'instant', block: 'start' });
-
-        // 4. Použijeme setTimeout, abychom dali prohlížeči čas
-        // na přepočítání scrollHeight po vložení blankSpaceDiv.
-        // Tím zajistíme, že se na nově přidaný prostor bude možné scrollovat.
-        setTimeout(() => {
-            // Po krátkém zpoždění se ujistíme, že je scroll stále na začátku příkladu.
-            // Nyní by již měl být k dispozici scroll pro zobrazení prázdného prostoru pod ním.
-            problemElement.scrollIntoView({ behavior: 'instant', block: 'start' });
-            updateProgressBar(); // Aktualizujeme progress bar po finálním posunutí
-        }, 0); // Nulové zpoždění znamená "co nejdříve v dalším cyklu událostí"
-
-        showFullscreenNavArrows(); // Zobrazíme šipky pro navigaci a počítadlo
+        // Update navigation arrows and counter
+        showFullscreenUIAndResetHideTimer();
+        updateProgressBar();
     }
 
-    // Funkce pro obsluhu kliknutí na tlačítko "Místo"
-    function handlePlaceButtonClick(event, series, num) {
-        event.preventDefault();
-
-        const targetProblemElement = event.target.closest('.problem');
-        if (!targetProblemElement) return;
-
-        // Případ 1: Kliknuto na aktuálně aktivní problém a fullscreen je aktivní.
-        // To znamená, že chceme fullscreen opustit.
-        if (activeProblemElement === targetProblemElement && document.fullscreenElement) {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-                // Cleanup bude zpracován v 'fullscreenchange' listeneru
-            }
-            return; // Akce zpracována, ukončíme funkci
-        }
-
-        // Případ 2: Kliknuto na jiný problém, nebo není aktivní fullscreen, nebo je aktivní fullscreen,
-        // ale ne pro problém (např. UI prohlížeče).
-        // Chceme aktivovat fullscreen pro targetProblemElement.
-
-        // Nejprve zajistíme, že jakýkoli stávající fullscreen je opuštěn.
-        // 'fullscreenchange' listener se postará o vyčištění activeProblemElement a activeBlankSpaceDiv.
-        if (document.fullscreenElement) {
-            pendingFullscreenRequest = targetProblemElement; // Uložíme element pro další požadavek
-            document.exitFullscreen();
-            return; // Počkáme, až se spustí 'fullscreenchange'
-        }
-
-        // Pokud není aktivní žádný fullscreen, pokračujeme přímo
-        requestAndPrepareFullscreen(targetProblemElement);
-    }
-
-    // Funkce, která skutečně požádá o fullscreen a připraví problém
+    // Funkce, která skutečně požádá o fullscreen a připraví problé
     function requestAndPrepareFullscreen(problemElement) {
-        // Reset před nastavením nového
-        if (activeBlankSpaceDiv && activeBlankSpaceDiv.parentNode) {
-            activeBlankSpaceDiv.parentNode.removeChild(activeBlankSpaceDiv);
-            activeBlankSpaceDiv = null;
-        }
-        activeProblemElement = null;
-
         if (document.documentElement.requestFullscreen) {
+            lastScrollPosition = window.scrollY; // Save scroll position
             document.documentElement.requestFullscreen().then(() => {
-                // Po úspěšném vstupu do fullscreenu se pokusíme uzamknout orientaci
+                // After successful fullscreen, lock orientation
                 if (screen.orientation && screen.orientation.lock) {
                     screen.orientation.lock('landscape').catch(err => {
                         console.warn("Nepodařilo se uzamknout orientaci obrazovky na landscape:", err);
-                        // Upozornění uživatele, pokud je to nutné, ale často je to jen omezení prohlížeče
                     });
-                } else {
-                    console.warn("Screen Orientation API není podporováno nebo lock() není k dispozici.");
                 }
                 prepareProblemForFullscreen(problemElement);
-                // updateProgressBar je volán uvnitř setTimeout v prepareProblemForFullscreen
             }).catch(err => {
                 console.error(`Chyba při pokusu o přepnutí do režimu celé obrazovky: ${err.message}`);
-                // Pokud fullscreen selže, stále připravíme problém pro zobrazení
+                // If fullscreen fails, still prepare the problem for display (without actual browser fullscreen)
                 prepareProblemForFullscreen(problemElement);
-                // updateProgressBar je volán uvnitř setTimeout v prepareProblemForFullscreen
-                hideFullscreenNavArrows(); // Skryjeme šipky a počítadlo, pokud fullscreen selhal
+                // If fullscreen failed, hide UI as it's not truly in fullscreen
+                hideFullscreenUI();
             });
         } else {
             alert("Váš prohlížeč nepodporuje režim celé obrazovky.");
             prepareProblemForFullscreen(problemElement);
-            // updateProgressBar je volán uvnitř setTimeout v prepareProblemForFullscreen
-            hideFullscreenNavArrows(); // Skryjeme šipky a počítadlo, pokud fullscreen není podporován
+            // If fullscreen not supported, hide UI
+            hideFullscreenUI();
         }
     }
 
-    // Funkce pro zobrazení šipek pro navigaci ve fullscreenu
-    function showFullscreenNavArrows() {
+    // Funkce pro obsluhu kliknutí na tlačítko "Projekce"
+    function toggleFullscreenForFirstVisibleProblem(event) {
+        event.stopPropagation(); // Prevent click from bubbling up to document and closing overlay
+
+        // If already in fullscreen, exit it
+        if (document.fullscreenElement) {
+            // If already in fullscreen, this button should not trigger anything,
+            // as the exit button is shown instead.
+            return;
+        }
+
+        const problems = Array.from(document.querySelectorAll('.problem'));
+        let firstVisibleProblem = null;
+
+        for (const problem of problems) {
+            const rect = problem.getBoundingClientRect();
+            // Problem is visible if its top is within the viewport and it's not completely off-screen below
+            if (rect.top >= 0 && rect.top < window.innerHeight) {
+                firstVisibleProblem = problem;
+                break;
+            }
+        }
+
+        if (firstVisibleProblem) {
+            requestAndPrepareFullscreen(firstVisibleProblem);
+        } else {
+            alert("Není viditelný žádný příklad k zobrazení na celou obrazovku.");
+        }
+    }
+
+    // Funkce pro zobrazení šipek a časovače pro navigaci ve fullscreenu
+    function showFullscreenUI() {
         const nextArrow = document.getElementById('nextProblemArrow');
         const prevArrow = document.getElementById('prevProblemArrow');
         const problemCounter = document.getElementById('fullscreenProblemCounter');
+        const exitButton = document.getElementById('exitFullscreenButton'); // Get the exit button
+        const projectionButton = document.querySelector('.projection-button'); // Get the normal projection button
+
         const allProblems = Array.from(document.querySelectorAll('.problem'));
         const currentProblemIndex = allProblems.indexOf(activeProblemElement);
 
         if (nextArrow) {
             nextArrow.style.display = 'block';
             nextArrow.disabled = currentProblemIndex >= allProblems.length - 1;
+            nextArrow.style.opacity = '1'; // Ensure visible when shown
         }
         if (prevArrow) {
             prevArrow.style.display = 'block';
             prevArrow.disabled = currentProblemIndex <= 0;
+            prevArrow.style.opacity = '1'; // Ensure visible when shown
         }
         if (problemCounter) {
-            // Použijeme displayIndex z activeProblemElement pro aktuální číslo
             const currentDisplayIndex = activeProblemElement ? parseInt(activeProblemElement.querySelector('.problem-number').textContent.replace('Příklad ', '')) : 0;
             problemCounter.textContent = `${currentDisplayIndex}/${currentDisplayedProblems.length}`;
             problemCounter.style.display = 'block';
         }
+        if (fullscreenTimerElement) {
+            fullscreenTimerElement.style.display = 'block';
+            fullscreenTimerElement.style.opacity = '1';
+        }
+        
+        // In fullscreen, hide projection button and show exit button
+        if (projectionButton) {
+            projectionButton.style.display = 'none'; // Hide the normal projection button
+        }
+        if (exitButton) {
+            exitButton.style.display = 'flex'; // Show the exit button immediately
+            // Position is now handled by CSS (top: 1rem, right: 1rem)
+        }
+
+        // Only hide arrows and timer after delay, exit button stays visible
+        hideFullscreenUIDelayed();
     }
 
-    // Funkce pro skrytí šipek pro navigaci ve fullscreenu
-    function hideFullscreenNavArrows() {
+    // Funkce pro skrytí šipek a časovače pro navigaci ve fullscreenu
+    function hideFullscreenUI() {
+        clearTimeout(fullscreenUIHideTimeout); // Clear any pending hide
         const nextArrow = document.getElementById('nextProblemArrow');
         const prevArrow = document.getElementById('prevProblemArrow');
         const problemCounter = document.getElementById('fullscreenProblemCounter');
-        if (nextArrow) {
-            nextArrow.style.display = 'none';
-        }
-        if (prevArrow) {
-            prevArrow.style.display = 'none';
-        }
-        if (problemCounter) {
-            problemCounter.style.display = 'none';
-        }
+        const exitButton = document.getElementById('exitFullscreenButton'); // Get the exit button
+        const projectionButton = document.querySelector('.projection-button'); // Get the normal projection button
+        const fullscreenTimerElement = document.getElementById('fullscreenTimer'); // Ensure timer is also handled
+
+        // First, set opacity to 0 for a smooth fade-out for elements that auto-hide
+        if (nextArrow) nextArrow.style.opacity = '0';
+        if (prevArrow) prevArrow.style.opacity = '0';
+        if (fullscreenTimerElement) fullscreenTimerElement.style.opacity = '0';
+
+        // After a short delay (to allow opacity transition), set display to none
+        setTimeout(() => {
+            if (nextArrow) nextArrow.style.display = 'none';
+            if (prevArrow) prevArrow.style.display = 'none';
+            if (problemCounter) problemCounter.style.display = 'none';
+            if (fullscreenTimerElement) fullscreenTimerElement.style.display = 'none';
+            
+            // Exit button and projection button are handled separately
+            if (exitButton) exitButton.style.display = 'none';
+            if (projectionButton) projectionButton.style.display = 'flex'; // Show projection button when not in fullscreen
+        }, 300); // Match CSS transition duration for opacity
     }
 
     // Funkce pro navigaci na předchozí příklad ve fullscreen režimu
@@ -1512,15 +1918,20 @@
         const currentProblemIndex = allProblems.indexOf(activeProblemElement);
 
         if (currentProblemIndex <= 0) {
-            alert("Jste na prvním příkladu.");
             return;
         }
 
         const prevProblemElement = allProblems[currentProblemIndex - 1];
         if (prevProblemElement) {
-            // prepareProblemForFullscreen se postará o odstranění starého blankSpaceDiv a nastavení nového
             prepareProblemForFullscreen(prevProblemElement);
-            // updateProgressBar je volán uvnitř setTimeout v prepareProblemForFullscreen
+            showFullscreenUIAndResetHideTimer(); // Show UI on navigation
+
+            // If solution overlay is open, update it for the new problem
+            if (overlay.style.display === 'flex') {
+                const newSeries = prevProblemElement.dataset.series;
+                const newNum = parseInt(prevProblemElement.dataset.num);
+                showSolution(newSeries, newNum);
+            }
         }
     }
 
@@ -1534,44 +1945,63 @@
         const currentProblemIndex = allProblems.indexOf(activeProblemElement);
 
         if (currentProblemIndex === -1 || currentProblemIndex >= allProblems.length - 1) {
-            alert("Jste na posledním příkladu.");
             return;
         }
 
         const nextProblemElement = allProblems[currentProblemIndex + 1];
         if (nextProblemElement) {
-            // prepareProblemForFullscreen se postará o odstranění starého blankSpaceDiv a nastavení nového
             prepareProblemForFullscreen(nextProblemElement);
-            // updateProgressBar je volán uvnitř setTimeout v prepareProblemForFullscreen
+            showFullscreenUIAndResetHideTimer(); // Show UI on navigation
+
+            // If solution overlay is open, update it for the new problem
+            if (overlay.style.display === 'flex') {
+                const newSeries = nextProblemElement.dataset.series;
+                const newNum = parseInt(nextProblemElement.dataset.num);
+                showSolution(newSeries, newNum);
+            }
         }
+    }
+
+    // Function to exit fullscreen directly
+    function exitFullscreen() {
+        document.exitFullscreen();
     }
 
     // Event listener pro změnu režimu celé obrazovky
     document.addEventListener('fullscreenchange', () => {
         if (!document.fullscreenElement) { // Uživatel opustil režim celé obrazovky
-            if (activeBlankSpaceDiv && activeBlankSpaceDiv.parentNode) {
-                activeBlankSpaceDiv.parentNode.removeChild(activeBlankSpaceDiv);
-                activeBlankSpaceDiv = null;
+            if (activeProblemElement) {
+                activeProblemElement.classList.remove('fullscreen-active');
             }
             activeProblemElement = null; // Reset aktivního problému při opuštění fullscreenu
-            hideFullscreenNavArrows(); // Skryjeme šipky a počítadlo
+            hideFullscreenUI(); // Skryjeme UI
+            stopFullscreenTimer(); // Stop timer
             updateProgressBar(); // Aktualizujeme progress bar pro normální režim
+
+            // Show all problems again
+            document.querySelectorAll('.problem').forEach(p => p.classList.remove('hidden-for-fullscreen'));
+
+            // Restore scroll position
+            window.scrollTo(0, lastScrollPosition);
+
+            // Close overlay if open
+            closeOverlay();
 
             // Odemkneme orientaci obrazovky
             if (screen.orientation && screen.orientation.unlock) {
                 screen.orientation.unlock();
             }
-
-            // Pokud existuje čekající požadavek na fullscreen, nyní je čas ho splnit
-            if (pendingFullscreenRequest) {
-                const elementToFullscreen = pendingFullscreenRequest;
-                pendingFullscreenRequest = null; // Vymažeme čekající požadavek
-                requestAndPrepareFullscreen(elementToFullscreen);
+        } else { // Entered fullscreen
+            // If we entered fullscreen on an element that is not activeProblemElement, update it
+            if (document.fullscreenElement.classList.contains('problem') && document.fullscreenElement !== activeProblemElement) {
+                prepareProblemForFullscreen(document.fullscreenElement);
             }
+            startFullscreenTimer(); // Start timer
+            showFullscreenUI(); // Ensure UI is shown immediately upon entering fullscreen
         }
     });
 
-    // Keyboard navigation
+    // Keyboard navigation for fullscreen
     document.addEventListener('keydown', function(e) {
         if (document.fullscreenElement && activeProblemElement) { // Pouze ve fullscreen "Místo" režimu
             if (e.key === "ArrowDown") {
@@ -1580,28 +2010,27 @@
             } else if (e.key === "ArrowUp") {
                 e.preventDefault();
                 navigateToPrevProblemInFullscreen();
+            } else if (e.key === "Escape") {
+                e.preventDefault(); // Prevent default browser exit
+                exitFullscreen(); // Directly exit fullscreen
             }
+            showFullscreenUIAndResetHideTimer(); // Show UI on key press
         }
     });
 
-    // Touch/Swipe navigation
+    // Touch/Swipe navigation - MODIFIED to allow internal scrolling
     document.addEventListener('touchstart', function(e) {
         if (document.fullscreenElement && activeProblemElement && e.touches.length === 1) {
             touchStartX = e.touches[0].clientX;
             touchStartY = e.touches[0].clientY;
         }
-    }, { passive: true }); // Použijte pasivní listener pro lepší výkon posouvání
+    }, { passive: true }); // Passive listener for better scroll performance
 
     document.addEventListener('touchmove', function(e) {
-        // Zabraňte výchozímu posouvání pouze pokud je detekováno přejetí a je ve fullscreenu
-        if (document.fullscreenElement && activeProblemElement && e.touches.length === 1) {
-            const touchMoveY = e.touches[0].clientY;
-            const deltaY = touchMoveY - touchStartY;
-            if (Math.abs(deltaY) > swipeThreshold / 2) { // Menší práh pro zahájení prevence výchozího chování
-                e.preventDefault();
-            }
-        }
-    }, { passive: false }); // Musí být nepasivní pro volání preventDefault
+        // In fullscreen, we now allow default scrolling within the problem.
+        // No e.preventDefault() here unless we want to block all scrolling.
+        // The problem element itself will handle its overflow scrolling.
+    }, { passive: true });
 
     document.addEventListener('touchend', function(e) {
         if (document.fullscreenElement && activeProblemElement && e.changedTouches.length === 1) {
@@ -1611,20 +2040,193 @@
             const deltaX = touchEndX - touchStartX;
             const deltaY = touchEndY - touchStartY;
 
-            // Kontrola vertikálního přejetí
-            if (Math.abs(deltaY) > swipeThreshold && Math.abs(deltaY) > Math.abs(deltaX)) {
-                if (deltaY < 0) { // Přejetí nahoru
-                    navigateToNextProblemInFullscreen();
-                } else { // Přejetí dolů
-                    navigateToPrevProblemInFullscreen();
-                }
-            }
+            // Only consider horizontal swipes for navigation (if we wanted to add it back)
+            // For vertical scrolling, we now rely on the native scroll of the fullscreen element.
+            // The user explicitly asked to disable vertical swipe for navigation between problems.
         }
         // Resetování souřadnic dotyku
         touchStartX = 0;
         touchStartY = 0;
+        if (document.fullscreenElement && activeProblemElement) {
+            showFullscreenUIAndResetHideTimer(); // Show UI on touch end
+        }
     });
 
+    // Overlay dragging logic - now only on header
+    overlayHeader.addEventListener('mousedown', (e) => {
+        if (e.button === 0) { // Left mouse button
+            isDraggingOverlay = true;
+            overlayDragOffsetX = e.clientX - overlay.getBoundingClientRect().left;
+            overlayDragOffsetY = e.clientY - overlay.getBoundingClientRect().top;
+            overlayHeader.style.cursor = 'grabbing';
+            overlay.style.transition = 'none'; // Disable transition during drag
+        }
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (isDraggingOverlay) {
+            e.preventDefault(); // Prevent text selection during drag
+            overlay.style.left = `${e.clientX - overlayDragOffsetX}px`;
+            overlay.style.top = `${e.clientY - overlayDragOffsetY}px`;
+            overlay.style.transform = 'none'; // Remove transform during drag
+        }
+    });
+
+    document.addEventListener('mouseup', () => {
+        if (isDraggingOverlay) {
+            isDraggingOverlay = false;
+            overlayHeader.style.cursor = 'grab';
+            overlay.style.transition = ''; // Re-enable transition
+        }
+    });
+    // Initial cursor style for header
+    overlayHeader.style.cursor = 'grab';
+
+
+    // Fullscreen UI auto-hide logic (arrows and timer)
+    function hideFullscreenUIDelayed() {
+        clearTimeout(fullscreenUIHideTimeout);
+        fullscreenUIHideTimeout = setTimeout(() => {
+            const prevArrow = document.getElementById('prevProblemArrow');
+            const nextArrow = document.getElementById('nextProblemArrow');
+            if (prevArrow) prevArrow.style.opacity = '0';
+            if (nextArrow) nextArrow.style.opacity = '0';
+            if (fullscreenTimerElement) fullscreenTimerElement.style.opacity = '0';
+        }, UI_HIDE_DELAY);
+    }
+
+    function showFullscreenUIAndResetHideTimer() {
+        clearTimeout(fullscreenUIHideTimeout);
+        const prevArrow = document.getElementById('prevProblemArrow');
+        const nextArrow = document.getElementById('nextProblemArrow');
+        if (prevArrow) {
+            prevArrow.style.display = 'block'; // Ensure it's visible
+            prevArrow.style.opacity = '1';
+        }
+        if (nextArrow) {
+            nextArrow.style.display = 'block'; // Ensure it's visible
+            nextArrow.style.opacity = '1';
+        }
+        if (fullscreenTimerElement) {
+            fullscreenTimerElement.style.display = 'block'; // Ensure it's visible
+            fullscreenTimerElement.style.opacity = '1';
+        }
+        hideFullscreenUIDelayed();
+    }
+
+    // Add event listeners for mousemove and click in fullscreen
+    document.addEventListener('mousemove', (e) => {
+        if (document.fullscreenElement && activeProblemElement) {
+            const viewportHeight = window.innerHeight;
+            const viewportWidth = window.innerWidth;
+            const mouseY = e.clientY;
+            const mouseX = e.clientX;
+            const activationZone = 100; // Pixels from edges
+
+            // Show UI if mouse is near top/bottom (for arrows) or bottom-left (for timer)
+            if (mouseY < activationZone || mouseY > viewportHeight - activationZone ||
+                (mouseY > viewportHeight - activationZone && mouseX < activationZone)) {
+                showFullscreenUIAndResetHideTimer();
+            } else {
+                // If mouse is in the middle, hide them after delay
+                hideFullscreenUIDelayed();
+            }
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        if (document.fullscreenElement && activeProblemElement) {
+            showFullscreenUIAndResetHideTimer();
+        }
+    });
+
+    // Timer functions
+    function formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+    }
+
+    function updateTimerDisplay() {
+        fullscreenTimerElement.textContent = formatTime(timerSeconds);
+    }
+
+    function showFullscreenAlert(message, duration, callback = null) {
+        fullscreenAlertOverlay.textContent = message;
+        fullscreenAlertOverlay.style.display = 'flex';
+        fullscreenAlertOverlay.classList.add('active'); // Block interactions
+
+        clearTimeout(fullscreenUIHideTimeout); // Clear any pending UI hide
+        showFullscreenUI(); // Ensure UI is visible during alert
+
+        setTimeout(() => {
+            fullscreenAlertOverlay.style.display = 'none';
+            fullscreenAlertOverlay.classList.remove('active');
+            if (callback) callback();
+            hideFullscreenUIDelayed(); // Restart UI hide timer after alert
+        }, duration);
+    }
+
+    function startFullscreenTimer() {
+        timerSeconds = 8100; // Reset to 135 minutes
+        twoMinuteAlertShown = false;
+        finalAlertShown = false;
+        fullscreenTimerElement.style.display = 'block';
+        updateTimerDisplay();
+        showFullscreenUIAndResetHideTimer(); // Show timer initially for 5s
+
+        timerInterval = setInterval(() => {
+            if (fullscreenAlertOverlay.classList.contains('active')) {
+                // If an alert is active, pause the timer countdown
+                return;
+            }
+
+            timerSeconds--;
+            updateTimerDisplay();
+
+            if (timerSeconds === 600 && !twoMinuteAlertShown) {
+                twoMinuteAlertShown = true;
+                showFullscreenAlert("10 minut do konce", 10000); // 10 seconds
+            }
+
+            if (timerSeconds <= 0) {
+                clearInterval(timerInterval);
+                showFullscreenAlert("KONEC, za 10s si budete moci zkontrolovat výsledky", 10000, () => {
+                    // After 10s, stay in fullscreen, move to first problem, and open solution
+                    if (currentDisplayedProblems.length > 0) {
+                        const firstProblem = currentDisplayedProblems[0];
+                        const firstProblemElement = document.querySelector(`.problem[data-series="${firstProblem.series}"][data-num="${firstProblem.num}"]`);
+                        if (firstProblemElement) {
+                            prepareProblemForFullscreen(firstProblemElement);
+                        }
+                        showSolution(firstProblem.series, firstProblem.num);
+                        showFullscreenUI(); // Keep UI visible after showing solution, don't auto-hide immediately
+                    }
+                });
+            }
+        }, 1000);
+    }
+
+    function stopFullscreenTimer() {
+        clearInterval(timerInterval);
+        fullscreenTimerElement.style.display = 'none';
+        fullscreenAlertOverlay.style.display = 'none'; // Hide any active alert
+        fullscreenAlertOverlay.classList.remove('active');
+        clearTimeout(fullscreenUIHideTimeout); // Clear any pending alert hide
+    }
+
+
+    // Function to update projection button position (fixed below header)
+    function updateProjectionButtonPosition() {
+        const projectionButton = document.querySelector('.projection-button');
+        const header = document.querySelector('header');
+        if (projectionButton && header) {
+            const headerBottom = header.getBoundingClientRect().bottom;
+            // Position it 10px below the header's bottom edge, or at 20px from top if header is off-screen
+            const newTop = Math.max(20, headerBottom + 10);
+            projectionButton.style.top = `${newTop}px`;
+        }
+    }
 
     // Načtení masterProblemList a datalistu při načtení stránky
     document.addEventListener('DOMContentLoaded', () => {
@@ -1640,12 +2242,20 @@
         if (prevProblemArrow) {
             prevProblemArrow.addEventListener('click', navigateToPrevProblemInFullscreen);
         }
+        loadProblems(); // Initial load of problems
+        updateProjectionButtonPosition(); // Set initial position for projection button
     });
 
     // Přidáme event listener pro scroll událost
-    window.addEventListener('scroll', updateProgressBar);
+    window.addEventListener('scroll', () => {
+        updateProgressBar();
+        updateProjectionButtonPosition(); // Update projection button position on scroll
+    });
     // Přidáme event listener pro resize událost, protože se může změnit scrollableHeight
-    window.addEventListener('resize', updateProgressBar);
+    window.addEventListener('resize', () => {
+        updateProgressBar();
+        updateProjectionButtonPosition(); // Update projection button position on resize
+    });
 </script>
 </body>
 </html>
