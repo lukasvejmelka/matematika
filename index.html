@@ -1407,7 +1407,6 @@
             problemDiv.className = "problem";
             problemDiv.setAttribute('data-series', series);
             problemDiv.setAttribute('data-num', num);
-            problemDiv.setAttribute('data-display-index', displayIndex); // NEW: Add display index to data attribute
             problemDiv.innerHTML = `
                 <div class="problem-header-content">
                     <div class="problem-info-text">
@@ -1483,7 +1482,6 @@
             problemDiv.className = "problem";
             problemDiv.setAttribute('data-series', series);
             problemDiv.setAttribute('data-num', num);
-            problemDiv.setAttribute('data-display-index', displayIndex); // NEW: Add display index to data attribute
             problemDiv.innerHTML = `
                 <div class="problem-header-content">
                     <div class="problem-info-text">
@@ -1557,7 +1555,6 @@
             problemDiv.className = "problem";
             problemDiv.setAttribute('data-series', foundProblem.series);
             problemDiv.setAttribute('data-num', foundProblem.num);
-            problemDiv.setAttribute('data-display-index', currentDisplayedProblems[0].displayIndex); // NEW: Add display index to data attribute
             problemDiv.innerHTML = `
                 <div class="problem-header-content">
                     <div class="problem-info-text">
@@ -1834,7 +1831,7 @@
             showProblemById(true);
         }
     });
-    clearIdInputBtn.addEventListener('click', clearProblemIdIdInput);
+    clearIdInputBtn.addEventListener('click', clearProblemIdInput);
     // --- End New/Modified ID Search Logic ---
 
 
@@ -1999,9 +1996,16 @@
             prevArrow.style.opacity = '1'; // Ensure visible when shown
         }
         if (problemCounter) {
-            // Read displayIndex directly from the activeProblemElement's data attribute
-            const currentDisplayIndex = activeProblemElement ? parseInt(activeProblemElement.dataset.displayIndex) : 0;
-            problemCounter.textContent = `${currentDisplayIndex}/${currentDisplayedProblems.length}`;
+            // Find the problem object in currentDisplayedProblems that matches activeProblemElement
+            const currentProblemData = currentDisplayedProblems.find(p => 
+                activeProblemElement && p.series === activeProblemElement.dataset.series && 
+                p.num === parseInt(activeProblemElement.dataset.num)
+            );
+            if (currentProblemData) {
+                problemCounter.textContent = `${currentProblemData.displayIndex}/${currentDisplayedProblems.length}`;
+            } else {
+                problemCounter.textContent = `?/${currentDisplayedProblems.length}`; // Fallback
+            }
             problemCounter.style.display = 'block';
         }
         if (fullscreenTimerElement) {
