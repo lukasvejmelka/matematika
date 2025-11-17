@@ -336,9 +336,9 @@
         .problem.fullscreen-active img {
             grid-column: 2; /* Place in the second column */
             grid-row: 1; /* Place in the first row */
-            max-width: 100%;
-            max-height: 100%; /* Fill available height */
-            object-fit: contain;
+            /* Removed max-width/height and object-fit to allow native pinch-zoom */
+            width: auto; /* Render at natural width */
+            height: auto; /* Render at natural height */
             margin: 0; /* Remove auto margin */
             touch-action: pan-x pan-y pinch-zoom; /* Enable pinch-zoom and panning */
             cursor: grab; /* Indicate draggable/zoomable */
@@ -1407,6 +1407,7 @@
             problemDiv.className = "problem";
             problemDiv.setAttribute('data-series', series);
             problemDiv.setAttribute('data-num', num);
+            problemDiv.setAttribute('data-display-index', displayIndex); // NEW: Add display index to data attribute
             problemDiv.innerHTML = `
                 <div class="problem-header-content">
                     <div class="problem-info-text">
@@ -1482,6 +1483,7 @@
             problemDiv.className = "problem";
             problemDiv.setAttribute('data-series', series);
             problemDiv.setAttribute('data-num', num);
+            problemDiv.setAttribute('data-display-index', displayIndex); // NEW: Add display index to data attribute
             problemDiv.innerHTML = `
                 <div class="problem-header-content">
                     <div class="problem-info-text">
@@ -1555,6 +1557,7 @@
             problemDiv.className = "problem";
             problemDiv.setAttribute('data-series', foundProblem.series);
             problemDiv.setAttribute('data-num', foundProblem.num);
+            problemDiv.setAttribute('data-display-index', currentDisplayedProblems[0].displayIndex); // NEW: Add display index to data attribute
             problemDiv.innerHTML = `
                 <div class="problem-header-content">
                     <div class="problem-info-text">
@@ -1700,11 +1703,10 @@
         const isFullscreen = document.fullscreenElement;
 
         if (e.key === "Escape") {
+            e.preventDefault(); // Always prevent default for Escape in this context
             if (isOverlayOpen) { // If solution overlay is open
-                e.preventDefault(); // Prevent default browser action (exiting fullscreen)
                 closeOverlay(); // Close the solution overlay
             } else if (isFullscreen) { // If in fullscreen but overlay is not open
-                e.preventDefault(); // Prevent default browser action
                 exitFullscreen(); // Exit fullscreen
             }
         } else if (isFullscreen && activeProblemElement) { // Only in fullscreen mode
@@ -1832,7 +1834,7 @@
             showProblemById(true);
         }
     });
-    clearIdInputBtn.addEventListener('click', clearProblemIdInput);
+    clearIdInputBtn.addEventListener('click', clearProblemIdIdInput);
     // --- End New/Modified ID Search Logic ---
 
 
@@ -1997,16 +1999,9 @@
             prevArrow.style.opacity = '1'; // Ensure visible when shown
         }
         if (problemCounter) {
-            // Find the problem object in currentDisplayedProblems that matches activeProblemElement
-            const currentProblemData = currentDisplayedProblems.find(p => 
-                activeProblemElement && p.series === activeProblemElement.dataset.series && 
-                p.num === parseInt(activeProblemElement.dataset.num)
-            );
-            if (currentProblemData) {
-                problemCounter.textContent = `${currentProblemData.displayIndex}/${currentDisplayedProblems.length}`;
-            } else {
-                problemCounter.textContent = `?/${currentDisplayedProblems.length}`; // Fallback
-            }
+            // Read displayIndex directly from the activeProblemElement's data attribute
+            const currentDisplayIndex = activeProblemElement ? parseInt(activeProblemElement.dataset.displayIndex) : 0;
+            problemCounter.textContent = `${currentDisplayIndex}/${currentDisplayedProblems.length}`;
             problemCounter.style.display = 'block';
         }
         if (fullscreenTimerElement) {
@@ -2378,7 +2373,7 @@
             // Pause timer
             clearInterval(timerInterval);
             timerRunning = false;
-            playPauseTimerBtn.innerHTML = '&#9658;'; // Play icon
+            playPauseTimerBtn.innerHTML = '&#10074;&#10074;'; // Pause icon
         } else {
             // Start/Resume timer
             timerRunning = true;
