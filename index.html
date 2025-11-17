@@ -352,7 +352,7 @@
             margin-bottom: 0; /* No margin below in fullscreen */
             gap: 0.5rem; /* Smaller gap */
             grid-column: 1; /* Place in the first column */
-            grid-row: 1; /* Place in the first row */
+            grid-row: 1;
             padding-top: 1rem; /* Initial padding, adjusted by exit button */
         }
 
@@ -1017,6 +1017,7 @@
                 height: 40px; /* Fixed height to make it square */
                 font-size: 1.1rem; /* Slightly smaller icon */
                 flex-shrink: 0; /* Prevent shrinking */
+                flex-basis: 40px; /* Explicitly define base size */
             }
             .id-search-group button {
                 flex-basis: 100%; /* Button takes full width on small screens */
@@ -1624,11 +1625,6 @@
     }
 
     function showSolution(series, num) {
-        if (timerRunning) {
-            // If timer is running, prevent showing solution
-            return;
-        }
-
         const solutionImage = document.getElementById("solutionImage");
         const overlayTitle = document.getElementById("overlayTitle");
         const prevBtn = document.getElementById("prevBtn");
@@ -1664,7 +1660,13 @@
 
         if (newIndex !== currentProblemIndex) {
             const problem = currentDisplayedProblems[newIndex];
-            showSolution(problem.series, problem.num);
+            showSolution(problem.series, problem.num); // This updates the overlay
+
+            // NEW: Update the main fullscreen problem display if in fullscreen
+            const newProblemElement = document.querySelector(`.problem[data-series="${problem.series}"][data-num="${problem.num}"]`);
+            if (newProblemElement && document.fullscreenElement) {
+                prepareProblemForFullscreen(newProblemElement);
+            }
         }
     }
 
@@ -1694,24 +1696,42 @@
     // Přidání podpory pro zavření overlay a navigaci pomocí kláves
     document.addEventListener("keydown", function(e) {
         const overlay = document.getElementById("overlay");
+        const isOverlayOpen = overlay.style.display === "flex";
+        const isFullscreen = document.fullscreenElement;
+
         if (e.key === "Escape") {
-            if (overlay.style.display === "flex") { // If solution overlay is open
+            if (isOverlayOpen) { // If solution overlay is open
                 e.preventDefault(); // Prevent default browser action (exiting fullscreen)
                 closeOverlay(); // Close the solution overlay
-            } else if (document.fullscreenElement) { // If in fullscreen but overlay is not open
+            } else if (isFullscreen) { // If in fullscreen but overlay is not open
                 e.preventDefault(); // Prevent default browser action
                 exitFullscreen(); // Exit fullscreen
             }
-        }
-        
-        // Fullscreen navigation arrows (only if in fullscreen and overlay is NOT open)
-        if (document.fullscreenElement && activeProblemElement && overlay.style.display !== "flex") {
-            if (e.key === "ArrowDown") {
-                e.preventDefault();
-                navigateToNextProblemInFullscreen();
-            } else if (e.key === "ArrowUp") {
-                e.preventDefault();
-                navigateToPrevProblemInFullscreen();
+        } else if (isFullscreen && activeProblemElement) { // Only in fullscreen mode
+            if (isOverlayOpen) { // If solution overlay is open
+                if (e.key === "ArrowLeft") {
+                    e.preventDefault();
+                    navigateSolution('prev');
+                } else if (e.key === "ArrowRight") {
+                    e.preventDefault();
+                    navigateSolution('next');
+                } else if (e.key === "ArrowUp" || e.key === "ArrowDown") { // NEW: Close solution and navigate
+                    e.preventDefault();
+                    closeOverlay();
+                    if (e.key === "ArrowUp") {
+                        navigateToPrevProblemInFullscreen();
+                    } else {
+                        navigateToNextProblemInFullscreen();
+                    }
+                }
+            } else { // Solution overlay is NOT open, but in fullscreen
+                if (e.key === "ArrowDown") {
+                    e.preventDefault();
+                    navigateToNextProblemInFullscreen();
+                } else if (e.key === "ArrowUp") {
+                    e.preventDefault();
+                    navigateToPrevProblemInFullscreen();
+                }
             }
             showFullscreenUIAndResetHideTimer(); // Show UI on key press
         }
@@ -1977,8 +1997,16 @@
             prevArrow.style.opacity = '1'; // Ensure visible when shown
         }
         if (problemCounter) {
-            const currentDisplayIndex = activeProblemElement ? parseInt(activeProblemElement.querySelector('.problem-number').textContent.replace('Příklad ', '')) : 0;
-            problemCounter.textContent = `${currentDisplayIndex}/${currentDisplayedProblems.length}`;
+            // Find the problem object in currentDisplayedProblems that matches activeProblemElement
+            const currentProblemData = currentDisplayedProblems.find(p => 
+                activeProblemElement && p.series === activeProblemElement.dataset.series && 
+                p.num === parseInt(activeProblemElement.dataset.num)
+            );
+            if (currentProblemData) {
+                problemCounter.textContent = `${currentProblemData.displayIndex}/${currentDisplayedProblems.length}`;
+            } else {
+                problemCounter.textContent = `?/${currentDisplayedProblems.length}`; // Fallback
+            }
             problemCounter.style.display = 'block';
         }
         if (fullscreenTimerElement) {
@@ -2129,22 +2157,22 @@
     });
 
     // Keyboard navigation for fullscreen
-    document.addEventListener('keydown', function(e) {
-        // This part is now handled by the general keydown listener for ESC
-        // if (document.fullscreenElement && activeProblemElement) { // Pouze ve fullscreen "Místo" režimu
-        //     if (e.key === "ArrowDown") {
-        //         e.preventDefault();
-        //         navigateToNextProblemInFullscreen();
-        //     } else if (e.key === "ArrowUp") {
-        //         e.preventDefault();
-        //         navigateToPrevProblemInFullscreen();
-        //     } else if (e.key === "Escape") {
-        //         e.preventDefault(); // Prevent default browser exit
-        //         exitFullscreen(); // Directly exit fullscreen
-        //     }
-        //     showFullscreenUIAndResetHideTimer(); // Show UI on key press
-        // }
-    });
+    // This part is now handled by the general keydown listener for ESC and arrows
+    // document.addEventListener('keydown', function(e) {
+    //     if (document.fullscreenElement && activeProblemElement) { // Pouze ve fullscreen "Místo" režimu
+    //         if (e.key === "ArrowDown") {
+    //             e.preventDefault();
+    //             navigateToNextProblemInFullscreen();
+    //         } else if (e.key === "ArrowUp") {
+    //             e.preventDefault();
+    //             navigateToPrevProblemInFullscreen();
+    //         } else if (e.key === "Escape") {
+    //             e.preventDefault(); // Prevent default browser exit
+    //             exitFullscreen(); // Directly exit fullscreen
+    //         }
+    //         showFullscreenUIAndResetHideTimer(); // Show UI on key press
+    //     }
+    // });
 
     // Touch/Swipe navigation - MODIFIED to allow internal scrolling
     document.addEventListener('touchstart', function(e) {
@@ -2184,10 +2212,15 @@
     overlayHeader.addEventListener('mousedown', (e) => {
         if (e.button === 0) { // Left mouse button
             isDraggingOverlay = true;
-            overlayDragOffsetX = e.clientX - overlay.getBoundingClientRect().left;
-            overlayDragOffsetY = e.clientY - overlay.getBoundingClientRect().top;
+            const rect = overlay.getBoundingClientRect();
+            overlayDragOffsetX = e.clientX - rect.left;
+            overlayDragOffsetY = e.clientY - rect.top;
             overlayHeader.style.cursor = 'grabbing';
             overlay.style.transition = 'none'; // Disable transition during drag
+
+            // Capture current dimensions and set them explicitly
+            overlay.style.width = `${rect.width}px`;
+            overlay.style.height = `${rect.height}px`;
         }
     });
 
@@ -2205,6 +2238,10 @@
             isDraggingOverlay = false;
             overlayHeader.style.cursor = 'grab';
             overlay.style.transition = ''; // Re-enable transition
+
+            // Clear explicit dimensions to allow responsive resizing again
+            overlay.style.width = '';
+            overlay.style.height = '';
         }
     });
     // Initial cursor style for header
@@ -2370,14 +2407,20 @@
 
     // Function to update the state of the "Show Solution" button
     function updateSolutionButtonState() {
-        const solutionButtons = document.querySelectorAll('.problem.fullscreen-active .show-solution');
-        solutionButtons.forEach(button => {
-            if (timerRunning) {
+        const allSolutionButtons = document.querySelectorAll('.problem .show-solution'); // Select ALL solution buttons
+
+        allSolutionButtons.forEach(button => {
+            const problemElement = button.closest('.problem');
+            const isFullscreenActiveProblem = problemElement && problemElement.classList.contains('fullscreen-active');
+
+            if (timerRunning && isFullscreenActiveProblem) {
                 button.classList.add('locked');
                 button.setAttribute('title', 'Při běžícím odpočtu jsou výsledky blokovány');
+                // Override onclick to do nothing or show a specific alert if needed,
+                // but for now, just prevent default action.
                 button.onclick = (event) => {
-                    event.stopPropagation(); // Prevent default action
-                    // No action, tooltip handles feedback
+                    event.stopPropagation();
+                    // The 'title' attribute provides the tooltip.
                 };
             } else {
                 button.classList.remove('locked');
