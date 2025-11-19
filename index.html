@@ -327,19 +327,18 @@
             box-shadow: none; /* No shadow in fullscreen */
             margin-bottom: 0;
             display: grid; /* Change to grid */
-            grid-template-columns: max-content 1fr; /* Left column for header, right for image */
-            grid-template-rows: 1fr; /* Single row */
+            grid-template-columns: 1fr; /* Single column for content */
+            grid-template-rows: auto 1fr; /* Header content then image */
             align-items: start; /* Align items to the top */
-            gap: 1rem; /* Space between columns */
+            gap: 1rem; /* Space between rows */
         }
 
         .problem.fullscreen-active img {
-            grid-column: 2; /* Place in the second column */
-            grid-row: 1; /* Place in the first row */
-            /* Removed max-width/height and object-fit to allow native pinch-zoom */
+            grid-column: 1; /* Place in the first column */
+            grid-row: 2; /* Place in the second row */
             width: auto; /* Render at natural width */
             height: auto; /* Render at natural height */
-            margin: 0; /* Remove auto margin */
+            margin: 0 auto; /* Center image horizontally */
             touch-action: pan-x pan-y pinch-zoom; /* Enable pinch-zoom and panning */
             cursor: grab; /* Indicate draggable/zoomable */
         }
@@ -352,7 +351,7 @@
             margin-bottom: 0; /* No margin below in fullscreen */
             gap: 0.5rem; /* Smaller gap */
             grid-column: 1; /* Place in the first column */
-            grid-row: 1;
+            grid-row: 1; /* Place in the first row */
             padding-top: 1rem; /* Initial padding, adjusted by exit button */
         }
 
@@ -836,6 +835,88 @@
             pointer-events: auto; /* Block clicks when active */
         }
 
+        /* NEW: Developer Mode Styles */
+        .category-checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+            justify-content: center; /* Center checkboxes horizontally */
+        }
+
+        .category-checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            background-color: #e3f2fd;
+            padding: 0.5rem 0.75rem;
+            border-radius: 5px;
+            font-size: 0.85rem;
+            white-space: normal; /* CHANGED: Allow text to wrap */
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .category-checkbox-label:hover {
+            background-color: #bbdefb;
+        }
+
+        .category-checkbox-input {
+            width: 16px;
+            height: 16px;
+            margin: 0;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        .category-summary-output {
+            background: #263238; /* Darker background for code-like output */
+            color: #e0e0e0; /* Light text */
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            margin-top: 2rem;
+            padding: 1.5rem;
+            font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace; /* Monospace font */
+            font-size: 0.9rem;
+            line-height: 1.6;
+            white-space: pre-wrap; /* Preserve whitespace and wrap */
+            word-break: break-word; /* Break long words */
+            position: relative;
+        }
+
+        .category-summary-output h3 {
+            color: #90a4ae; /* Lighter grey for heading */
+            margin-top: 0;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+
+        .category-summary-output pre {
+            margin: 0;
+            padding: 0;
+            user-select: text; /* Allow text selection */
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+        }
+
+        .copy-feedback {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            pointer-events: none; /* Allow clicks to pass through */
+        }
+
 
         /* Mobilní optimalizace */
         @media (max-width: 768px) {
@@ -1057,6 +1138,15 @@
                 min-width: 40px;
                 min-height: 40px;
             }
+
+            /* NEW: Developer Mode Mobile Adjustments */
+            .category-checkbox-group {
+                flex-direction: column; /* Stack checkboxes vertically on small screens */
+                align-items: flex-start; /* Align to left */
+            }
+            .category-checkbox-label {
+                width: 100%; /* Full width for labels */
+            }
         }
 
         @media (max-width: 480px) {
@@ -1179,7 +1269,11 @@
                 <option value="16j">2016 - jaro</option>
                 <option value="16p">2016 - podzim</option>
                 <option value="17j">2017 - jaro</option>
-                <option value="2025-podzim">2025 - Podzim</option>
+                <option value="17p">2017 - podzim</option>
+                <option value="18j">2018 - jaro</option>
+                <option value="18p">2018 - podzim</option>
+                <option value="19j">2019 - jaro</option>
+                <option value="19p">2019 - podzim</option>
                 <option value="ilustracni-test">Ilustracni test</option>
                 <option value="vzorove-ulohy">Vzorové úlohy</option>
             </select>
@@ -1195,6 +1289,11 @@
             <div class="checkbox-group">
                 <input type="checkbox" id="randomOrderCheckbox" onchange="loadProblems()">
                 <label for="randomOrderCheckbox">Náhodné pořadí</label>
+            </div>
+            <!-- NEW: Developer Mode Checkbox -->
+            <div class="checkbox-group">
+                <input type="checkbox" id="developerModeCheckbox" onchange="toggleDeveloperMode()">
+                <label for="developerModeCheckbox">Vývojářský mód</label>
             </div>
             <div class="range-section">
                 <div class="range-input">
@@ -1220,6 +1319,14 @@
     </div>
 
     <div id="problems"></div>
+
+    <!-- NEW: Developer Mode Summary Output -->
+    <div id="developerModeSummary" class="category-summary-output" style="display: none;">
+        <h3>Souhrn kategorií příkladů:</h3>
+        <pre id="categorySummaryContent"></pre>
+        <button id="clearCategorySummaryBtn" class="clear-filter" style="margin-top: 1rem;">Smazat výpis</button>
+        <div class="copy-feedback" id="copyFeedback">Zkopírováno do schránky!</div>
+    </div>
 </div>
 
 <div class="overlay" id="overlay">
@@ -1250,6 +1357,11 @@
         "16j": 25,
         "16p": 25,
         "17j": 24,
+        "17p": 26,
+        "18j": 23,
+        "18p": 25,
+        "19j": 26,
+        "19p": 24,
         "2025-podzim": 3,
         "ilustracni-test": 3,
         "vzorove-ulohy": 3
@@ -1316,6 +1428,28 @@
     const resetTimerBtn = document.getElementById('resetTimerBtn');
     const fullscreenTimerControls = document.getElementById('fullscreenTimerControls');
 
+    // NEW: Developer Mode Variables
+    const PROBLEM_CATEGORIES = [
+        "Číselné obory",
+        "Algebraické výrazy",
+        "Rovnice a nerovnice",
+        "Funkce",
+        "Posloupnosti a finanční matematika",
+        "Planimetrie",
+        "Stereometrie",
+        "Analytická geometrie",
+        "Kombinatorika, pravděpodobnost a statistika"
+    ];
+    let developerModeActive = false;
+    // Stores data in format: { "series/num": ["category1", "category2"], ... }
+    let problemCategoryData = {};
+    const LOCAL_STORAGE_KEY = 'problemCategoryData';
+    const developerModeCheckbox = document.getElementById('developerModeCheckbox');
+    const developerModeSummary = document.getElementById('developerModeSummary');
+    const categorySummaryContent = document.getElementById('categorySummaryContent');
+    const copyFeedback = document.getElementById('copyFeedback');
+    const clearCategorySummaryBtn = document.getElementById('clearCategorySummaryBtn');
+
 
     // Funkce pro zamíchání pole (Fisher-Yates shuffle)
     function shuffleArray(array) {
@@ -1380,6 +1514,7 @@
         if (selectedSeries.length === 0 && selectedTopics.length === 0) {
             currentDisplayedProblems = [];
             problemCountDiv.textContent = `Počet příkladů: 0`;
+            updateCategorySummary(); // NEW: Update summary even if no problems
             return;
         }
 
@@ -1407,6 +1542,27 @@
             problemDiv.className = "problem";
             problemDiv.setAttribute('data-series', series);
             problemDiv.setAttribute('data-num', num);
+
+            // NEW: Add category checkboxes if developer mode is active
+            let categoryCheckboxesHtml = '';
+            if (developerModeActive) {
+                categoryCheckboxesHtml = `<div class="category-checkbox-group" id="categoryCheckboxesContainer_${series}_${num}">`;
+                PROBLEM_CATEGORIES.forEach(category => {
+                    const problemId = `${series}/${num}`;
+                    const isChecked = problemCategoryData[problemId] && problemCategoryData[problemId].includes(category) ? 'checked' : '';
+                    const uniqueId = `cat-${series}-${num}-${category.replace(/\s/g, '-')}`; // Unique ID for checkbox
+                    categoryCheckboxesHtml += `
+                        <label class="category-checkbox-label">
+                            <input type="checkbox" class="category-checkbox-input"
+                                data-series="${series}" data-num="${num}" data-category="${category}"
+                                id="${uniqueId}" ${isChecked}>
+                            ${category}
+                        </label>
+                    `;
+                });
+                categoryCheckboxesHtml += `</div>`;
+            }
+
             problemDiv.innerHTML = `
                 <div class="problem-header-content">
                     <div class="problem-info-text">
@@ -1414,10 +1570,25 @@
                         <div class="problem-id">ID: ${series}/${num}</div>
                     </div>
                     <button class="show-solution" data-series="${series}" data-num="${num}">Zobrazit řešení</button>
+                    ${categoryCheckboxesHtml} <!-- Insert category checkboxes here -->
                 </div>
                 <img src="files/${series}/${num}.png" alt="Úloha ${num}" />
             `;
             problemsDiv.appendChild(problemDiv);
+
+            // NEW: Attach event listeners for category checkboxes if developer mode is active
+            if (developerModeActive) {
+                const checkboxes = problemDiv.querySelectorAll('.category-checkbox-input');
+                checkboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', (e) => {
+                        const series = e.target.dataset.series;
+                        const num = parseInt(e.target.dataset.num);
+                        const category = e.target.dataset.category;
+                        const isChecked = e.target.checked;
+                        handleCategoryCheckboxChange(series, num, category, isChecked);
+                    });
+                });
+            }
         });
 
         problemCountDiv.textContent = `Počet příkladů: ${currentDisplayedProblems.length}`;
@@ -1429,6 +1600,7 @@
             };
         });
         updateSolutionButtonState(); // Update solution button state after problems are loaded
+        updateCategorySummary(); // NEW: Update summary after problems are loaded
     }
 
     // Nová funkce pro načtení příkladů a posun na první z nich
@@ -1482,6 +1654,27 @@
             problemDiv.className = "problem";
             problemDiv.setAttribute('data-series', series);
             problemDiv.setAttribute('data-num', num);
+
+            // NEW: Add category checkboxes if developer mode is active
+            let categoryCheckboxesHtml = '';
+            if (developerModeActive) {
+                categoryCheckboxesHtml = `<div class="category-checkbox-group" id="categoryCheckboxesContainer_${series}_${num}">`;
+                PROBLEM_CATEGORIES.forEach(category => {
+                    const problemId = `${series}/${num}`;
+                    const isChecked = problemCategoryData[problemId] && problemCategoryData[problemId].includes(category) ? 'checked' : '';
+                    const uniqueId = `cat-${series}-${num}-${category.replace(/\s/g, '-')}`;
+                    categoryCheckboxesHtml += `
+                        <label class="category-checkbox-label">
+                            <input type="checkbox" class="category-checkbox-input"
+                                data-series="${series}" data-num="${num}" data-category="${category}"
+                                id="${uniqueId}" ${isChecked}>
+                            ${category}
+                        </label>
+                    `;
+                });
+                categoryCheckboxesHtml += `</div>`;
+            }
+
             problemDiv.innerHTML = `
                 <div class="problem-header-content">
                     <div class="problem-info-text">
@@ -1489,10 +1682,25 @@
                         <div class="problem-id">ID: ${series}/${num}</div>
                     </div>
                     <button class="show-solution" data-series="${series}" data-num="${num}">Zobrazit řešení</button>
+                    ${categoryCheckboxesHtml} <!-- Insert category checkboxes here -->
                 </div>
                 <img src="files/${series}/${num}.png" alt="Úloha ${num}" />
             `;
             problemsDiv.appendChild(problemDiv);
+
+            // NEW: Attach event listeners for category checkboxes if developer mode is active
+            if (developerModeActive) {
+                const checkboxes = problemDiv.querySelectorAll('.category-checkbox-input');
+                checkboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', (e) => {
+                        const series = e.target.dataset.series;
+                        const num = parseInt(e.target.dataset.num);
+                        const category = e.target.dataset.category;
+                        const isChecked = e.target.checked;
+                        handleCategoryCheckboxChange(series, num, category, isChecked);
+                    });
+                });
+            }
         });
 
         document.getElementById("problemCount").textContent = `Počet příkladů: ${currentDisplayedProblems.length}`;
@@ -1504,6 +1712,7 @@
             };
         });
         updateSolutionButtonState(); // Update solution button state after problems are loaded
+        updateCategorySummary(); // NEW: Update summary after problems are loaded
     }
 
     // Nová funkce pro zobrazení příkladu podle ID
@@ -1518,6 +1727,7 @@
             // If input is empty, just clear problems and return
             currentDisplayedProblems = [];
             problemCountDiv.textContent = `Počet příkladů: 0`;
+            updateCategorySummary(); // NEW: Update summary
             return;
         }
 
@@ -1526,6 +1736,7 @@
             // Invalid format, handled by validateProblemId
             currentDisplayedProblems = [];
             problemCountDiv.textContent = `Počet příkladů: 0`;
+            updateCategorySummary(); // NEW: Update summary
             return;
         }
         const series = idParts[0];
@@ -1535,6 +1746,7 @@
             // Invalid number, handled by validateProblemId
             currentDisplayedProblems = [];
             problemCountDiv.textContent = `Počet příkladů: 0`;
+            updateCategorySummary(); // NEW: Update summary
             return;
         }
 
@@ -1555,6 +1767,27 @@
             problemDiv.className = "problem";
             problemDiv.setAttribute('data-series', foundProblem.series);
             problemDiv.setAttribute('data-num', foundProblem.num);
+
+            // NEW: Add category checkboxes if developer mode is active
+            let categoryCheckboxesHtml = '';
+            if (developerModeActive) {
+                categoryCheckboxesHtml = `<div class="category-checkbox-group" id="categoryCheckboxesContainer_${series}_${num}">`;
+                PROBLEM_CATEGORIES.forEach(category => {
+                    const problemId = `${series}/${num}`;
+                    const isChecked = problemCategoryData[problemId] && problemCategoryData[problemId].includes(category) ? 'checked' : '';
+                    const uniqueId = `cat-${series}-${num}-${category.replace(/\s/g, '-')}`;
+                    categoryCheckboxesHtml += `
+                        <label class="category-checkbox-label">
+                            <input type="checkbox" class="category-checkbox-input"
+                                data-series="${series}" data-num="${num}" data-category="${category}"
+                                id="${uniqueId}" ${isChecked}>
+                            ${category}
+                        </label>
+                    `;
+                });
+                categoryCheckboxesHtml += `</div>`;
+            }
+
             problemDiv.innerHTML = `
                 <div class="problem-header-content">
                     <div class="problem-info-text">
@@ -1562,6 +1795,7 @@
                         <div class="problem-id">ID: ${foundProblem.series}/${foundProblem.num}</div>
                     </div>
                     <button class="show-solution" data-series="${foundProblem.series}" data-num="${foundProblem.num}">Zobrazit řešení</button>
+                    ${categoryCheckboxesHtml} <!-- Insert category checkboxes here -->
                 </div>
                 <img src="files/${foundProblem.series}/${foundProblem.num}.png" alt="Úloha ${foundProblem.num}" />
             `;
@@ -1571,6 +1805,20 @@
             // Posuneme se na zobrazený problém, pokud je autoScroll true
             if (autoScroll && problemsDiv.firstElementChild) {
                 problemsDiv.firstElementChild.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            // NEW: Attach event listeners for category checkboxes if developer mode is active
+            if (developerModeActive) {
+                const checkboxes = problemDiv.querySelectorAll('.category-checkbox-input');
+                checkboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', (e) => {
+                        const series = e.target.dataset.series;
+                        const num = parseInt(e.target.dataset.num);
+                        const category = e.target.dataset.category;
+                        const isChecked = e.target.checked;
+                        handleCategoryCheckboxChange(series, num, category, isChecked);
+                    });
+                });
             }
         } else {
             // This case should ideally be caught by validateProblemId before calling showProblemById
@@ -1585,6 +1833,7 @@
             };
         });
         updateSolutionButtonState(); // Update solution button state after problems are loaded
+        updateCategorySummary(); // NEW: Update summary after problems are loaded
     }
 
     function clearFilters() {
@@ -1790,10 +2039,11 @@
         problemIdHelpText.textContent = 'Nápověda: Zadejte ID ve formátu "16j/12"';
 
         if (inputId === '') {
-            // If input is empty, reset and return
+            // If input is empty, just clear problems and return
             currentDisplayedProblems = []; // Clear displayed problems
             document.getElementById("problems").innerHTML = '';
             document.getElementById("problemCount").textContent = `Počet příkladů: 0`;
+            updateCategorySummary(); // NEW: Update summary
             return;
         }
 
@@ -1815,6 +2065,7 @@
             document.getElementById("problems").innerHTML = '';
             document.getElementById("problemCount").textContent = `Počet příkladů: 0`;
         }
+        updateCategorySummary(); // NEW: Update summary
     }
 
     function clearProblemIdInput() {
@@ -1982,24 +2233,26 @@
         const exitButton = document.getElementById('exitFullscreenButton'); // Get the exit button
         const projectionButton = document.querySelector('.projection-button'); // Get the normal projection button
 
-        const allProblems = Array.from(document.querySelectorAll('.problem'));
-        const currentProblemIndex = activeProblemElement ? allProblems.indexOf(activeProblemElement) : -1;
+        // Find the actual problem data from currentDisplayedProblems using data attributes
+        const activeProblemSeries = activeProblemElement ? activeProblemElement.dataset.series : null;
+        const activeProblemNum = activeProblemElement ? parseInt(activeProblemElement.dataset.num) : null;
+        const currentProblemDataIndex = currentDisplayedProblems.findIndex(p => p.series === activeProblemSeries && p.num === activeProblemNum);
+
 
         if (nextArrow) {
             nextArrow.style.display = 'block';
-            nextArrow.disabled = currentProblemIndex >= allProblems.length - 1;
+            nextArrow.disabled = currentProblemDataIndex >= currentDisplayedProblems.length - 1;
             nextArrow.style.opacity = '1'; // Ensure visible when shown
         }
         if (prevArrow) {
             prevArrow.style.display = 'block';
-            prevArrow.disabled = currentProblemIndex <= 0;
+            prevArrow.disabled = currentProblemDataIndex <= 0;
             prevArrow.style.opacity = '1'; // Ensure visible when shown
         }
         if (problemCounter) {
-            // Find the problem object in currentDisplayedProblems that matches activeProblemElement
-            const currentProblemData = currentDisplayedProblems.find(p => 
-                activeProblemElement && p.series === activeProblemElement.dataset.series && 
-                p.num === parseInt(activeProblemElement.dataset.num)
+            // UPDATED: Get the displayIndex from the found problem data
+            const currentProblemData = currentDisplayedProblems.find(p =>
+                p.series === activeProblemSeries && p.num === activeProblemNum
             );
             if (currentProblemData) {
                 problemCounter.textContent = `${currentProblemData.displayIndex}/${currentDisplayedProblems.length}`;
@@ -2063,54 +2316,58 @@
 
     // Funkce pro navigaci na předchozí příklad ve fullscreen režimu
     function navigateToPrevProblemInFullscreen() {
-        if (!activeProblemElement || !document.fullscreenElement) {
+        if (!activeProblemElement || !document.fullscreenElement || currentDisplayedProblems.length === 0) {
             return;
         }
 
-        const allProblems = Array.from(document.querySelectorAll('.problem'));
-        const currentProblemIndex = allProblems.indexOf(activeProblemElement);
+        const currentSeries = activeProblemElement.dataset.series;
+        const currentNum = parseInt(activeProblemElement.dataset.num);
 
-        if (currentProblemIndex <= 0) {
-            return;
+        const currentProblemDataIndex = currentDisplayedProblems.findIndex(p => p.series === currentSeries && p.num === currentNum);
+
+        if (currentProblemDataIndex <= 0) {
+            return; // Already at the first problem
         }
 
-        const prevProblemElement = allProblems[currentProblemIndex - 1];
-        if (prevProblemElement) {
-            prepareProblemForFullscreen(prevProblemElement);
-            showFullscreenUIAndResetHideTimer(); // Show UI on navigation
+        const prevProblemData = currentDisplayedProblems[currentProblemDataIndex - 1];
+        if (prevProblemData) {
+            const prevProblemElement = document.querySelector(`.problem[data-series="${prevProblemData.series}"][data-num="${prevProblemData.num}"]`);
+            if (prevProblemElement) {
+                prepareProblemForFullscreen(prevProblemElement);
+                showFullscreenUIAndResetHideTimer();
 
-            // If solution overlay is open, update it for the new problem
-            if (overlay.style.display === 'flex') {
-                const newSeries = prevProblemElement.dataset.series;
-                const newNum = parseInt(prevProblemElement.dataset.num);
-                showSolution(newSeries, newNum);
+                if (overlay.style.display === 'flex') {
+                    showSolution(prevProblemData.series, prevProblemData.num);
+                }
             }
         }
     }
 
     // Funkce pro navigaci na další příklad ve fullscreen režimu
     function navigateToNextProblemInFullscreen() {
-        if (!activeProblemElement || !document.fullscreenElement) {
+        if (!activeProblemElement || !document.fullscreenElement || currentDisplayedProblems.length === 0) {
             return;
         }
 
-        const allProblems = Array.from(document.querySelectorAll('.problem'));
-        const currentProblemIndex = allProblems.indexOf(activeProblemElement);
+        const currentSeries = activeProblemElement.dataset.series;
+        const currentNum = parseInt(activeProblemElement.dataset.num);
 
-        if (currentProblemIndex === -1 || currentProblemIndex >= allProblems.length - 1) {
-            return;
+        const currentProblemDataIndex = currentDisplayedProblems.findIndex(p => p.series === currentSeries && p.num === currentNum);
+
+        if (currentProblemDataIndex === -1 || currentProblemDataIndex >= currentDisplayedProblems.length - 1) {
+            return; // Already at the last problem or not found
         }
 
-        const nextProblemElement = allProblems[currentProblemIndex + 1];
-        if (nextProblemElement) {
-            prepareProblemForFullscreen(nextProblemElement);
-            showFullscreenUIAndResetHideTimer(); // Show UI on navigation
+        const nextProblemData = currentDisplayedProblems[currentProblemDataIndex + 1];
+        if (nextProblemData) {
+            const nextProblemElement = document.querySelector(`.problem[data-series="${nextProblemData.series}"][data-num="${nextProblemData.num}"]`);
+            if (nextProblemElement) {
+                prepareProblemForFullscreen(nextProblemElement);
+                showFullscreenUIAndResetHideTimer();
 
-            // If solution overlay is open, update it for the new problem
-            if (overlay.style.display === 'flex') {
-                const newSeries = nextProblemElement.dataset.series;
-                const newNum = parseInt(nextProblemElement.dataset.num);
-                showSolution(newSeries, newNum);
+                if (overlay.style.display === 'flex') {
+                    showSolution(nextProblemData.series, nextProblemData.num);
+                }
             }
         }
     }
@@ -2446,10 +2703,106 @@
         }
     }
 
+    // NEW: Developer Mode Functions
+    function toggleDeveloperMode() {
+        developerModeActive = developerModeCheckbox.checked;
+        loadProblems(); // Re-render problems to show/hide category checkboxes
+        updateCategorySummary(); // Show/hide and update summary
+    }
+
+    function handleCategoryCheckboxChange(series, num, category, isChecked) {
+        const problemId = `${series}/${num}`;
+        if (!problemCategoryData[problemId]) {
+            problemCategoryData[problemId] = [];
+        }
+
+        if (isChecked) {
+            if (!problemCategoryData[problemId].includes(category)) {
+                problemCategoryData[problemId].push(category);
+            }
+        } else {
+            problemCategoryData[problemId] = problemCategoryData[problemId].filter(cat => cat !== category);
+            if (problemCategoryData[problemId].length === 0) {
+                delete problemCategoryData[problemId]; // Remove entry if no categories selected
+            }
+        }
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(problemCategoryData));
+        updateCategorySummary();
+    }
+
+    function updateCategorySummary() {
+        if (!developerModeActive) {
+            developerModeSummary.style.display = 'none';
+            return;
+        }
+
+        developerModeSummary.style.display = 'block';
+        let summaryText = '';
+        const summaryByCategory = {};
+
+        // Initialize all categories
+        PROBLEM_CATEGORIES.forEach(category => {
+            summaryByCategory[category] = [];
+        });
+
+        // Populate with problem numbers
+        for (const problemId in problemCategoryData) {
+            const categories = problemCategoryData[problemId];
+            const problemNum = problemId.split('/')[1]; // Get the number part of the ID
+            categories.forEach(category => {
+                if (summaryByCategory[category]) {
+                    summaryByCategory[category].push(parseInt(problemNum));
+                }
+            });
+        }
+
+        // Sort problem numbers within each category
+        for (const category in summaryByCategory) {
+            summaryByCategory[category].sort((a, b) => a - b);
+            summaryText += `${category} - [${summaryByCategory[category].join(', ')}]\n`;
+        }
+
+        categorySummaryContent.textContent = summaryText.trim();
+    }
+
+    // NEW: Function to clear all categories
+    function clearAllCategories() {
+        if (confirm("Opravdu chcete smazat všechny zaškrtnuté kategorie u všech příkladů? Tato akce je nevratná.")) {
+            problemCategoryData = {}; // Reset the data
+            localStorage.removeItem(LOCAL_STORAGE_KEY); // Clear from localStorage
+            loadProblems(); // Re-render all problems to uncheck checkboxes
+            updateCategorySummary(); // Update the summary output
+        }
+    }
+
+    // NEW: Clipboard copy on text selection in summary
+    categorySummaryContent.addEventListener('mouseup', (e) => {
+        const selectedText = window.getSelection().toString();
+        if (selectedText.length > 0 && categorySummaryContent.contains(e.target)) {
+            navigator.clipboard.writeText(selectedText).then(() => {
+                copyFeedback.style.opacity = '1';
+                setTimeout(() => {
+                    copyFeedback.style.opacity = '0';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        }
+    });
+
+
     // Načtení masterProblemList a datalistu při načtení stránky
     document.addEventListener('DOMContentLoaded', () => {
         generateMasterProblemList();
         updateProgressBar(); // Nastavíme počáteční stav progress baru
+
+        // NEW: Load developer mode state and data from localStorage
+        const storedData = localStorage.getItem(LOCAL_STORAGE_KEY);
+        if (storedData) {
+            problemCategoryData = JSON.parse(storedData);
+        }
+        developerModeCheckbox.checked = localStorage.getItem('developerModeActive') === 'true';
+        developerModeActive = developerModeCheckbox.checked;
 
         // Přidáme event listenery pro šipky "Další příklad" a "Předchozí příklad"
         const nextProblemArrow = document.getElementById('nextProblemArrow');
@@ -2460,10 +2813,16 @@
         if (prevProblemArrow) {
             prevProblemArrow.addEventListener('click', navigateToPrevProblemInFullscreen);
         }
+        // NEW: Attach event listener for clear categories button
+        if (clearCategorySummaryBtn) {
+            clearCategorySummaryBtn.addEventListener('click', clearAllCategories);
+        }
+
         loadProblems(); // Initial load of problems
         updateProjectionButtonPosition(); // Set initial position for projection button
         updateTimerDisplay(); // Set initial timer display
         updateSolutionButtonState(); // Initial update for solution button state
+        updateCategorySummary(); // NEW: Initial update for developer mode summary
     });
 
     // Přidáme event listener pro scroll událost
@@ -2475,6 +2834,11 @@
     window.addEventListener('resize', () => {
         updateProgressBar();
         updateProjectionButtonPosition(); // Update projection button position on resize
+    });
+
+    // NEW: Save developer mode state to localStorage on checkbox change
+    developerModeCheckbox.addEventListener('change', () => {
+        localStorage.setItem('developerModeActive', developerModeCheckbox.checked);
     });
 </script>
 </body>
