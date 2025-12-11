@@ -389,14 +389,14 @@
             <input
                 type="text"
                 id="searchId"
-                placeholder="Zadejte ID příkladu (např. 2023-leto/3)"
+                placeholder="Zadejte ID příkladu (např. 25j/8)"
             />
             <button class="clear-input-button" id="clearSearchButton" onclick="clearSearchInput()" style="display: none;">&#x2715;</button>
             <button class="settings-cog-button" id="settingsCogButton" onclick="toggleAdvancedOptions()">
                 <i class="fas fa-cog"></i>
             </button>
         </div>
-        <div class="hint" id="hintText">Nápověda: Zadejte ID ve formátu "2023-leto/3".</div>
+        <div class="hint" id="hintText">Nápověda: Zadejte ID ve formátu "25j/8".</div>
         <div class="error-message" id="notFoundMessage" style="display: none;">Neexistující ID</div>
     </div>
 
@@ -423,12 +423,29 @@
 
 <script>
     const problemsCount = {
+        "vzor": 127,
+        "ilustr": 25,
         "16j": 25,
-        "2023-podzim": 3,
-        "2024-leto": 3,
-        "2025-podzim": 3,
-        "ilustracni-test": 3,
-        "vzorove-ulohy": 3
+        "16p": 25,
+        "17j": 24,
+        "17p": 26,
+        "18j": 23,
+        "18p": 25,
+        "19j": 26,
+        "19p": 24,
+        "20j": 25,
+        "20p": 25,
+        "21j": 26,
+        "21jm": 25,
+        "21p": 26,
+        "22j": 24,
+        "22p": 24,
+        "23j": 23,
+        "23p": 24,
+        "24j": 25,
+        "24p": 25,
+        "25j": 24,
+        "25p": 24,
     };
 
     let allProblems = []; // Uložíme všechny příklady pro pozdější filtrování
