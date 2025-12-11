@@ -1266,17 +1266,30 @@
         <div class="select-group">
             <label for="series">Vyberte sérii:</label>
             <select id="series" multiple size="6" onchange="loadProblems()">
-                <option value="16j">2016 - jaro</option>
-                <option value="16p">2016 - podzim</option>
-                <option value="17j">2017 - jaro</option>
-                <option value="17p">2017 - podzim</option>
-                <option value="18j">2018 - jaro</option>
-                <option value="18p">2018 - podzim</option>
-                <option value="19j">2019 - jaro</option>
-                <option value="19p">2019 - podzim</option>
-                <option value="ilustracni-test">Ilustracni test</option>
-                <option value="vzorove-ulohy">Vzorové úlohy</option>
-            </select>
+      <option value="25p">2025 - pozdim</option>
+      <option value="25j">2025 - jaro</option>
+      <option value="24p">2024 - pozdim</option> 
+      <option value="24j">2024 - jaro</option>
+      <option value="23p">2023 - pozdim</option> 
+      <option value="23j">2023 - jaro</option>
+      <option value="22p">2022 - pozdim</option> 
+      <option value="22j">2022 - jaro</option>
+      <option value="21p">2021 - pozdim</option> 
+      <option value="21jm">2021 - jaro mimořádné</option>
+      <option value="21j">2021 - jaro</option>
+      <option value="20p">2020 - pozdim</option> 
+      <option value="20j">2020 - jaro</option>
+      <option value="19p">2019 - pozdim</option> 
+      <option value="19j">2019 - jaro</option>
+      <option value="18p">2018 - pozdim</option> 
+      <option value="18j">2018 - jaro</option>
+      <option value="17p">2017 - pozdim</option> 
+      <option value="17j">2017 - jaro</option>
+      <option value="16p">2016 - pozdim</option>      
+      <option value="16j">2016 - jaro</option>
+      <option value="ilustr">ilustrační test</option> 
+      <option value="vzor">vzorové příklady</option>
+           </select>
         </div>
 
         <button class="go-to-problems-button" onclick="loadProblemsAndScroll()">Přejít na výpis příkladů</button>
@@ -1354,6 +1367,8 @@
 
 <script>
     const problemsCount = {
+        "vzor": 127,
+        "ilustr": 25,
         "16j": 25,
         "16p": 25,
         "17j": 24,
@@ -1362,31 +1377,41 @@
         "18p": 25,
         "19j": 26,
         "19p": 24,
-        "2025-podzim": 3,
-        "ilustracni-test": 3,
-        "vzorove-ulohy": 3
+        "20j": 25,
+        "20p": 25,
+        "21j": 26,
+        "21jm": 25,
+        "21p": 26,
+        "22j": 24,
+        "22p": 24,
+        "23j": 23,
+        "23p": 24,
+        "24j": 25,
+        "24p": 25,
+        "25j": 24,
+        "25p": 24,
     };
 
     const topics = {
         "geometrie": {
             "16j": [1, 3],
-            "2023-podzim": [2, 3],
-            "vzorove-ulohy": [1]
+            "25p": [2, 3],
+            "ilustr": [1]
         },
         "posloupnosti": {
             "16j": [2],
-            "2023-podzim": [1],
-            "vzorove-ulohy": [2]
+            "23p": [1],
+            "24p": [2]
         },
         "rovnice": {
             "16j": [1, 2],
-            "2025-podzim": [1],
-            "ilustracni-test": [1]
+            "21jm": [1],
+            "vzor": [1]
         },
         "vyrazy": {
             "16j": [3],
-            "2025-podzim": [2],
-            "ilustracni-test": [2]
+            "vzor": [2],
+            "ilustr": [2]
         }
     };
 
