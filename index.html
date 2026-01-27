@@ -22,12 +22,12 @@
       position: fixed;
       top: 0;
       left: 0;
-      height: 5px; /* Výška progress baru */
-      background-color: #1565c0; /* Tmavší odstín modré */
-      width: 0%; /* Počáteční šířka */
-      z-index: 10000; /* Zajistí, že bude nad všemi ostatními prvky */
-      transition: width 0.1s ease-out, opacity 0.3s ease-in-out; /* Plynulá animace šířky a průhlednosti */
-      opacity: 0; /* Skryto na začátku */
+      height: 5px;
+      background-color: #1565c0;
+      width: 0%;
+      z-index: 10000;
+      transition: width 0.1s ease-out, opacity 0.3s ease-in-out;
+      opacity: 0;
     }
 
     header {
@@ -39,7 +39,7 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.2);
       flex-wrap: wrap;
       gap: 1rem;
-      padding-top: calc(1rem + 5px); /* 1rem + výška progress baru */
+      padding-top: calc(1rem + 5px);
       position: relative;
     }
 
@@ -96,7 +96,7 @@
       font-size: 0.9rem;
       cursor: pointer;
       transition: background-color 0.2s ease;
-      display: flex;
+      display: flex; /* Default: visible */
       align-items: center;
       justify-content: center;
       min-width: 48px;
@@ -121,7 +121,7 @@
       font-size: 0.8rem;
       cursor: pointer;
       transition: background-color 0.2s ease, opacity 0.2s ease;
-      display: none;
+      display: none; /* Default: hidden */
       align-items: center;
       justify-content: center;
       min-width: 32px;
@@ -138,6 +138,73 @@
       max-width: 900px;
       margin: 1rem auto;
       padding: 0 1rem;
+    }
+
+    /* Pinned Section Styles */
+    #pinnedSection {
+      display: none;
+      background: #fff;
+      border: 2px solid #ef5350;
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 12px rgba(239, 83, 80, 0.15);
+    }
+
+    #pinnedSection h2 {
+      margin-top: 0;
+      font-size: 1.2rem;
+      color: #d32f2f;
+    }
+
+    #pinnedIdList {
+      background: #fdf2f2;
+      border: 1px solid #ffcdd2;
+      padding: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #b71c1c;
+      word-break: break-all;
+      transition: background 0.2s;
+    }
+
+    #pinnedIdList:hover {
+      background: #ffebee;
+    }
+
+    #pinnedShareLink {
+      font-size: 0.85rem;
+      color: #1e88e5;
+      text-decoration: underline;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      display: block;
+      word-break: break-all;
+    }
+    #pinnedShareLink:hover {
+      color: #1565c0;
+    }
+
+    .pinned-controls {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .delete-pinned-btn {
+      background-color: #ef5350;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background 0.2s;
+    }
+
+    .delete-pinned-btn:hover {
+      background-color: #d32f2f;
     }
 
     .filters-section {
@@ -186,7 +253,8 @@
     }
 
     .toggle-advanced-filters,
-    .go-to-problems-button {
+    .go-to-problems-button,
+    .reset-filters-button {
       display: block;
       width: 100%;
       padding: 0.75rem 1.5rem;
@@ -216,6 +284,14 @@
       background-color: #45a049;
     }
 
+    .reset-filters-button {
+      background-color: #ef5350;
+    }
+
+    .reset-filters-button:hover {
+      background-color: #d32f2f;
+    }
+
     #advancedFilters {
       display: none;
       animation: fadeIn 0.3s ease-out;
@@ -226,11 +302,25 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    .range-section {
+    .range-section, .list-search-section {
       background-color: #f8f9fa;
       padding: 1rem;
       border-radius: 8px;
       margin: 1rem 0;
+    }
+
+    .list-search-section label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .list-search-section input {
+      width: 100%;
+      padding: 0.75rem;
+      border-radius: 8px;
+      border: 2px solid #e0e0e0;
+      outline: none;
     }
 
     .range-input {
@@ -296,6 +386,13 @@
       text-align: center;
       position: relative;
       display: block;
+      border: 3px solid transparent;
+      transition: border-color 0.3s;
+    }
+
+    /* Pinned Problem Style */
+    .problem.pinned {
+      border-color: #ef5350;
     }
 
     .problem img {
@@ -325,12 +422,10 @@
       grid-template-rows: auto 1fr;
       align-items: start;
       gap: 1rem;
-
-      /* NOVÉ: Skrytí scrollbaru */
-      -ms-overflow-style: none;  /* IE and Edge */
-      scrollbar-width: none;  /* Firefox */
+      -ms-overflow-style: none;
+      scrollbar-width: none;
     }
-    /* NOVÉ: Skrytí scrollbaru pro WebKit prohlížeče (Chrome, Safari) */
+    
     .problem.fullscreen-active::-webkit-scrollbar {
         display: none;
     }
@@ -370,17 +465,48 @@
       margin: 0;
     }
 
-    .problem.fullscreen-active .show-solution {
+    .controls-row {
+      display: flex;
+      gap: 0.5rem;
+      width: 100%;
       order: 2;
-      position: static;
-      margin-top: 0;
+    }
+
+    .problem.fullscreen-active .show-solution {
       width: auto;
       max-width: none;
       align-self: flex-start;
-      flex-shrink: 0;
       padding: 0.75rem 1rem;
       font-size: 0.9rem;
       min-height: 40px;
+    }
+
+    .pin-button {
+      background: #eee;
+      border: none;
+      border-radius: 8px;
+      width: 48px;
+      height: 48px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .pin-button:hover {
+      background: #e0e0e0;
+    }
+
+    .pin-button.active {
+      background: #ffebee;
+      color: #ef5350;
+    }
+
+    .problem.fullscreen-active .pin-button {
+      height: 40px;
+      width: 40px;
     }
 
     .problem.hidden-for-fullscreen {
@@ -405,7 +531,6 @@
 
     .show-solution {
       display: inline-block;
-      margin-top: 0;
       padding: 1rem 2rem;
       background-color: #1e88e5;
       color: white;
@@ -575,28 +700,38 @@
       right: 10px;
     }
 
-    .checkbox-group {
-      margin-bottom: 1rem;
+    .category-checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #eee;
+      justify-content: center;
+    }
+
+    .category-checkbox-label {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      padding: 0.75rem 0;
-      border-top: 1px solid #eee;
-      border-bottom: 1px solid #eee;
+      gap: 0.25rem;
+      background-color: #e3f2fd;
+      padding: 0.5rem 0.75rem;
+      border-radius: 5px;
+      font-size: 0.85rem;
+      white-space: normal;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
     }
 
-    .checkbox-group input[type="checkbox"] {
-      width: 20px;
-      height: 20px;
+    .category-checkbox-label:hover {
+      background-color: #bbdefb;
+    }
+
+    .category-checkbox-input {
+      width: 16px;
+      height: 16px;
       margin: 0;
       flex-shrink: 0;
-      cursor: pointer;
-    }
-
-    .checkbox-group label {
-      margin: 0;
-      font-weight: 500;
-      color: #333;
       cursor: pointer;
     }
 
@@ -706,12 +841,12 @@
       color: #9e9e9e;
       cursor: pointer;
       z-index: 10002;
-      display: none;
+      display: none; /* Default: hidden */
       transition: opacity 0.3s ease;
       padding: 10px 20px;
       background-color: rgba(255, 255, 255, 0.1);
       border-radius: 10px;
-      opacity: 1;
+      opacity: 0; /* Default: hidden */
     }
 
     .fullscreen-nav-arrow:hover:not(:disabled) {
@@ -742,10 +877,11 @@
       padding: 10px 15px;
       border-radius: 10px;
       z-index: 10002;
-      display: none;
+      display: none; /* Default: hidden */
       pointer-events: none;
       user-select: none;
       transition: opacity 0.3s ease;
+      opacity: 0; /* Default: hidden */
     }
 
     #fullscreenTimer {
@@ -758,10 +894,10 @@
       background-color: rgba(255, 255, 255, 0.1);
       padding: 10px 15px;
       border-radius: 10px;
-      display: none;
+      display: none; /* Default: hidden */
       user-select: none;
       transition: opacity 0.3s ease;
-      opacity: 1;
+      opacity: 0; /* Default: hidden */
     }
     #fullscreenTimer.hidden {
       opacity: 0;
@@ -772,8 +908,8 @@
       bottom: 20px;
       left: 150px;
       z-index: 10002;
-      display: none;
-      opacity: 1;
+      display: none; /* Default: hidden */
+      opacity: 0; /* Default: hidden */
       transition: opacity 0.3s ease;
       display: flex;
       gap: 10px;
@@ -821,41 +957,6 @@
       pointer-events: auto;
     }
 
-    .category-checkbox-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-top: 1rem;
-      padding-top: 1rem;
-      border-top: 1px solid #eee;
-      justify-content: center;
-    }
-
-    .category-checkbox-label {
-      display: flex;
-      align-items: center;
-      gap: 0.25rem;
-      background-color: #e3f2fd;
-      padding: 0.5rem 0.75rem;
-      border-radius: 5px;
-      font-size: 0.85rem;
-      white-space: normal;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-    }
-
-    .category-checkbox-label:hover {
-      background-color: #bbdefb;
-    }
-
-    .category-checkbox-input {
-      width: 16px;
-      height: 16px;
-      margin: 0;
-      flex-shrink: 0;
-      cursor: pointer;
-    }
-
     .category-summary-output {
       background: #263238;
       color: #e0e0e0;
@@ -889,27 +990,29 @@
     }
 
     .copy-feedback {
-      position: absolute;
-      bottom: 10px;
-      right: 10px;
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
       background-color: #4CAF50;
       color: white;
-      padding: 0.5rem 1rem;
-      border-radius: 5px;
-      font-size: 0.8rem;
+      padding: 0.75rem 1.5rem;
+      border-radius: 30px;
+      font-size: 1rem;
       opacity: 0;
       transition: opacity 0.3s ease-in-out;
       pointer-events: none;
+      z-index: 20000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
 
-    /* Styles for classification status message */
     #classificationStatus.all-classified {
-        background-color: #e8f5e9; /* Light green */
-        color: #2e7d32; /* Dark green */
+        background-color: #e8f5e9;
+        color: #2e7d32;
     }
     #classificationStatus.not-all-classified {
-        background-color: #ffebee; /* Light red */
-        color: #c62828; /* Dark red */
+        background-color: #ffebee;
+        color: #c62828;
     }
 
 
@@ -1131,14 +1234,6 @@
         min-width: 40px;
         min-height: 40px;
       }
-
-      .category-checkbox-group {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      .category-checkbox-label {
-        width: 100%;
-      }
     }
 
     @media (max-width: 480px) {
@@ -1239,6 +1334,16 @@
 </button>
 
 <div class="container">
+  <!-- NOVÉ: Sekce pro přišpendlené příklady -->
+  <div id="pinnedSection">
+    <h2>Přišpendlené příklady:</h2>
+    <div id="pinnedIdList" title="Klikněte pro zkopírování výčtu do schránky"></div>
+    <a href="#" id="pinnedShareLink" title="Klikněte pro zkopírování odkazu do schránky"></a>
+    <div class="pinned-controls">
+      <button class="delete-pinned-btn" onclick="clearPinnedList()">Smazat výčet</button>
+    </div>
+  </div>
+
   <div class="filters-section">
     <div class="select-group">
       <label for="topic">Vyberte téma:</label>
@@ -1288,12 +1393,20 @@
     </div>
 
     <button class="go-to-problems-button" onclick="loadProblemsAndScroll()">Přejít na výpis příkladů</button>
+    <!-- NOVÉ: Tlačítko Resetovat filtr -->
+    <button class="reset-filters-button" onclick="resetFilters()">Resetovat filtr</button>
 
     <div id="problemCount">Počet příkladů: 0</div>
 
     <button class="toggle-advanced-filters" onclick="toggleAdvancedFilters()">Více možností filtrování</button>
 
     <div id="advancedFilters">
+      <!-- NOVÉ: Zobrazení výčtu -->
+      <div class="list-search-section">
+        <label for="idListInput">Zobrazení výčtu (např. 24j/12, 20p/2):</label>
+        <input type="text" id="idListInput" placeholder="Zadejte ID oddělená čárkou" oninput="loadFromIdList(this.value)" />
+      </div>
+
       <div class="checkbox-group">
         <input type="checkbox" id="randomOrderCheckbox" onchange="loadProblems()">
         <label for="randomOrderCheckbox">Náhodné pořadí</label>
@@ -1326,7 +1439,6 @@
 
   <div id="problems"></div>
 
-  <!-- NOVÉ: Element pro zprávu o zatřídění příkladů -->
   <div id="classificationStatus" style="margin-top: 1rem; padding: 0.75rem; border-radius: 8px; text-align: center; font-weight: bold; display: none;"></div>
 
   <div id="developerModeSummary" class="category-summary-output" style="display: none;">
@@ -1336,9 +1448,10 @@
     <button id="downloadCategorySummaryBtn" style="margin-top: 0.5rem; width: 100%; padding: 0.75rem 1.5rem; background-color: #1e88e5; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; min-height: 48px;">
       Stáhnout výpis jako .txt
     </button>
-    <div class="copy-feedback" id="copyFeedback">Zkopírováno do schránky!</div>
   </div>
 </div>
+
+<div class="copy-feedback" id="copyFeedback">Výčet vložen do schránky!</div>
 
 <div class="overlay" id="overlay">
   <button class="overlay-nav-arrow left" id="prevBtn" title="Předchozí příklad">&larr;</button>
@@ -1368,13 +1481,13 @@
 <script>
   let masterProblemList = [];
   let currentDisplayedProblems = [];
+  let pinnedProblems = new Set();
 
   let activeProblemElement = null;
   let lastScrollPosition = 0;
 
   let touchStartX = 0;
   let touchStartY = 0;
-  const swipeThreshold = 50;
 
   let isDraggingOverlay = false;
   let overlayDragOffsetX, overlayDragOffsetY;
@@ -1389,7 +1502,6 @@
   let timerSeconds = 8100;
   let timerRunning = false;
   let twoMinuteAlertShown = false;
-  let finalAlertShown = false;
 
   const fullscreenTimerElement = document.getElementById('fullscreenTimer');
   const fullscreenAlertOverlay = document.createElement('div');
@@ -1400,7 +1512,6 @@
   const resetTimerBtn = document.getElementById('resetTimerBtn');
   const fullscreenTimerControls = document.getElementById('fullscreenTimerControls');
 
-  // Aktualizováno, aby odpovídalo zobrazovaným názvům v selectu
   const PROBLEM_CATEGORIES = [
     "Číselné obory, procenta",
     "Výrazy",
@@ -1418,13 +1529,18 @@
   let developerModeActive = false;
   let problemCategoryData = {};
   const LOCAL_STORAGE_KEY = 'problemCategoryData';
+  const PINNED_STORAGE_KEY = 'pinnedProblems';
+  
   const developerModeCheckbox = document.getElementById('developerModeCheckbox');
   const developerModeSummary = document.getElementById('developerModeSummary');
   const categorySummaryContent = document.getElementById('categorySummaryContent');
   const copyFeedback = document.getElementById('copyFeedback');
   const clearCategorySummaryBtn = document.getElementById('clearCategorySummaryBtn');
   const downloadCategorySummaryBtn = document.getElementById('downloadCategorySummaryBtn');
-  const classificationStatusDiv = document.getElementById('classificationStatus'); // NOVÉ
+  const classificationStatusDiv = document.getElementById('classificationStatus');
+  const idListInput = document.getElementById('idListInput');
+  const pinnedSection = document.getElementById('pinnedSection');
+  const pinnedIdListDiv = document.getElementById('pinnedIdList');
 
   let currentProblemIndex = -1;
 
@@ -1442,25 +1558,118 @@
         allPossibleProblems.add(JSON.stringify({ series: seriesKey, num: i }));
       }
     }
-    for (const topicKey in topics) {
-      const selectedTopic = topics[topicKey];
-      for (const seriesKey in selectedTopic) {
-        const problemIndices = selectedTopic[seriesKey];
-        problemIndices.forEach(num => {
-          allPossibleProblems.add(JSON.stringify({ series: seriesKey, num }));
-        });
-      }
-    }
     masterProblemList = Array.from(allPossibleProblems).map(item => JSON.parse(item));
+  }
+
+  // --- PINNING LOGIC ---
+
+  function togglePin(series, num, event) {
+    if (event) event.stopPropagation();
+    const id = `${series}/${num}`;
+    if (pinnedProblems.has(id)) {
+      pinnedProblems.delete(id);
+    } else {
+      pinnedProblems.add(id);
+    }
+    localStorage.setItem(PINNED_STORAGE_KEY, JSON.stringify(Array.from(pinnedProblems)));
+    updatePinnedUI();
+    
+    // Aktualizace vizuálu v seznamu
+    const problemEls = document.querySelectorAll(`.problem[data-series="${series}"][data-num="${num}"]`);
+    problemEls.forEach(el => {
+      if (pinnedProblems.has(id)) el.classList.add('pinned');
+      else el.classList.remove('pinned');
+      const btn = el.querySelector('.pin-button');
+      if (btn) btn.classList.toggle('active', pinnedProblems.has(id));
+    });
+  }
+
+  function updatePinnedUI() {
+    const pinnedShareLink = document.getElementById('pinnedShareLink');
+    if (pinnedProblems.size > 0) {
+      pinnedSection.style.display = 'block';
+      const sortedIds = Array.from(pinnedProblems).sort();
+      const idsString = sortedIds.join(', ');
+      pinnedIdListDiv.textContent = idsString;
+
+      const baseUrl = `${window.location.origin}${window.location.pathname}`;
+      const shareableLink = `${baseUrl}?=${sortedIds.join(',')}`; // Using '?=' as requested
+      
+      pinnedShareLink.textContent = shareableLink;
+      pinnedShareLink.href = shareableLink;
+      pinnedShareLink.style.display = 'block'; // Show the link
+    } else {
+      pinnedSection.style.display = 'none';
+      pinnedShareLink.style.display = 'none'; // Hide the link if no pinned problems
+    }
+  }
+
+  function clearPinnedList() {
+    if (confirm("Opravdu chcete smazat celý výčet přišpendlených příkladů?")) {
+      pinnedProblems.clear();
+      localStorage.removeItem(PINNED_STORAGE_KEY);
+      updatePinnedUI();
+      loadProblems();
+    }
+  }
+
+  function copyPinnedToClipboard() {
+    const text = pinnedIdListDiv.textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      showCopyFeedback("Výčet vložen do schránky!");
+    });
+  }
+
+  pinnedIdListDiv.addEventListener('click', copyPinnedToClipboard);
+
+  function showCopyFeedback(message) {
+    copyFeedback.textContent = message;
+    copyFeedback.style.opacity = '1';
+    setTimeout(() => {
+      copyFeedback.style.opacity = '0';
+    }, 2000);
+  }
+
+  // --- FILTERING LOGIC ---
+
+  function resetFilters() {
+    // Vyčistit selecty
+    document.getElementById("series").selectedIndex = -1;
+    document.getElementById("topic").selectedIndex = -1;
+    // Vyčistit inputy
+    document.getElementById("rangeFrom").value = '';
+    document.getElementById("rangeTo").value = '';
+    document.getElementById("problemIdInput").value = '';
+    idListInput.value = '';
+    // Vyčistit checkbox
+    document.getElementById("randomOrderCheckbox").checked = false;
+    
+    loadProblems();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function loadFromIdList(input) {
+    if (!input.trim()) {
+      loadProblems();
+      return;
+    }
+
+    const ids = input.split(',').map(s => s.trim().toLowerCase()).filter(s => s !== '');
+    const filtered = [];
+    
+    ids.forEach(id => {
+      const found = masterProblemList.find(p => `${p.series}/${p.num}` === id);
+      if (found) filtered.push(found);
+    });
+
+    currentDisplayedProblems = filtered.map((p, i) => ({ ...p, displayIndex: i + 1 }));
+    renderProblems();
   }
 
   function loadProblems() {
     const seriesSelect = document.getElementById("series");
     const topicSelect = document.getElementById("topic");
-    const problemsDiv = document.getElementById("problems");
-    const problemCountDiv = document.getElementById("problemCount");
     const randomOrderCheckbox = document.getElementById("randomOrderCheckbox");
-    problemsDiv.innerHTML = '';
 
     const selectedSeries = Array.from(seriesSelect.selectedOptions).map(option => option.value);
     const selectedTopics = Array.from(topicSelect.selectedOptions).map(option => option.value);
@@ -1480,11 +1689,9 @@
       });
     }
 
-    if (selectedSeries.length === 0 && selectedTopics.length === 0) {
+    if (selectedSeries.length === 0 && selectedTopics.length === 0 && !idListInput.value) {
       currentDisplayedProblems = [];
-      problemCountDiv.textContent = `Počet příkladů: 0`;
-      updateCategorySummary();
-      updateClassificationStatus(); // NOVÉ
+      renderProblems();
       return;
     }
 
@@ -1503,17 +1710,25 @@
       displayIndex: i + 1
     }));
 
+    renderProblems();
+  }
+
+  function renderProblems() {
+    const problemsDiv = document.getElementById("problems");
+    const problemCountDiv = document.getElementById("problemCount");
+    problemsDiv.innerHTML = '';
+
     currentDisplayedProblems.forEach(({ series, num, displayIndex }) => {
+      const problemId = `${series}/${num}`;
       const problemDiv = document.createElement("div");
-      problemDiv.className = "problem";
+      problemDiv.className = `problem ${pinnedProblems.has(problemId) ? 'pinned' : ''}`;
       problemDiv.setAttribute('data-series', series);
       problemDiv.setAttribute('data-num', num);
 
       let categoryCheckboxesHtml = '';
       if (developerModeActive) {
-        categoryCheckboxesHtml = `<div class="category-checkbox-group" id="categoryCheckboxesContainer_${series}_${num}">`;
+        categoryCheckboxesHtml = `<div class="category-checkbox-group">`;
         PROBLEM_CATEGORIES.forEach(category => {
-          const problemId = `${series}/${num}`;
           const isChecked = problemCategoryData[problemId] && problemCategoryData[problemId].includes(category) ? 'checked' : '';
           const uniqueId = `cat-${series}-${num}-${category.replace(/\s/g, '-')}`;
           categoryCheckboxesHtml += `
@@ -1532,9 +1747,14 @@
         <div class="problem-header-content">
           <div class="problem-info-text">
             <div class="problem-number">Příklad ${displayIndex}</div>
-            <div class="problem-id">ID: ${series}/${num}</div>
+            <div class="problem-id">ID: ${problemId}</div>
           </div>
-          <button class="show-solution" data-series="${series}" data-num="${num}">Zobrazit řešení</button>
+          <div class="controls-row">
+            <button class="show-solution" data-series="${series}" data-num="${num}">Zobrazit řešení</button>
+            <button class="pin-button ${pinnedProblems.has(problemId) ? 'active' : ''}" 
+                    onclick="togglePin('${series}', ${num}, event)" 
+                    title="Přišpendlit příklad">&#128204;</button>
+          </div>
           ${categoryCheckboxesHtml}
         </div>
         <img src="files/${series}/${num}.png" alt="Úloha ${num}" />
@@ -1542,14 +1762,9 @@
       problemsDiv.appendChild(problemDiv);
 
       if (developerModeActive) {
-        const checkboxes = problemDiv.querySelectorAll('.category-checkbox-input');
-        checkboxes.forEach(checkbox => {
+        problemDiv.querySelectorAll('.category-checkbox-input').forEach(checkbox => {
           checkbox.addEventListener('change', (e) => {
-            const series = e.target.dataset.series;
-            const num = parseInt(e.target.dataset.num);
-            const category = e.target.dataset.category;
-            const isChecked = e.target.checked;
-            handleCategoryCheckboxChange(series, num, category, isChecked);
+            handleCategoryCheckboxChange(series, num, e.target.dataset.category, e.target.checked);
           });
         });
       }
@@ -1564,7 +1779,7 @@
     });
     updateSolutionButtonState();
     updateCategorySummary();
-    updateClassificationStatus(); // NOVÉ
+    updateClassificationStatus();
   }
 
   function loadProblemsAndScroll() {
@@ -1576,244 +1791,51 @@
   }
 
   function applyRange() {
-    const rangeFromInput = document.getElementById("rangeFrom");
-    const rangeToInput = document.getElementById("rangeTo");
-    const rangeFrom = parseInt(rangeFromInput.value);
-    const rangeTo = parseInt(rangeToInput.value);
-    const problemsDiv = document.getElementById("problems");
-    const randomOrderCheckbox = document.getElementById("randomOrderCheckbox");
-    problemsDiv.innerHTML = '';
-
+    const rangeFrom = parseInt(document.getElementById("rangeFrom").value);
+    const rangeTo = parseInt(document.getElementById("rangeTo").value);
+    
     if (isNaN(rangeFrom) || isNaN(rangeTo)) {
-      alert("Prosím zadejte platné čísla pro rozsah.");
+      alert("Prosím zadejte platná čísla pro rozsah.");
       return;
     }
 
-    if (currentDisplayedProblems.length === 0) {
-      loadProblems();
-    }
+    if (currentDisplayedProblems.length === 0) loadProblems();
 
-    let rangedProblems = [];
-    for (let i = 0; i < currentDisplayedProblems.length; i++) {
-      if (currentDisplayedProblems[i].displayIndex >= rangeFrom && currentDisplayedProblems[i].displayIndex <= rangeTo) {
-        rangedProblems.push(currentDisplayedProblems[i]);
-      }
-    }
+    currentDisplayedProblems = currentDisplayedProblems.filter(p => 
+      p.displayIndex >= rangeFrom && p.displayIndex <= rangeTo
+    );
 
-    if (randomOrderCheckbox.checked) {
-      shuffleArray(rangedProblems);
-    }
-
-    currentDisplayedProblems = rangedProblems;
-
-    currentDisplayedProblems.forEach(({ series, num, displayIndex }) => {
-      const problemDiv = document.createElement("div");
-      problemDiv.className = "problem";
-      problemDiv.setAttribute('data-series', series);
-      problemDiv.setAttribute('data-num', num);
-
-      let categoryCheckboxesHtml = '';
-      if (developerModeActive) {
-        categoryCheckboxesHtml = `<div class="category-checkbox-group" id="categoryCheckboxesContainer_${series}_${num}">`;
-        PROBLEM_CATEGORIES.forEach(category => {
-          const problemId = `${series}/${num}`;
-          const isChecked = problemCategoryData[problemId] && problemCategoryData[problemId].includes(category) ? 'checked' : '';
-          const uniqueId = `cat-${series}-${num}-${category.replace(/\s/g, '-')}`;
-          categoryCheckboxesHtml += `
-            <label class="category-checkbox-label">
-              <input type="checkbox" class="category-checkbox-input"
-                data-series="${series}" data-num="${num}" data-category="${category}"
-                id="${uniqueId}" ${isChecked}>
-              ${category}
-            </label>
-          `;
-        });
-        categoryCheckboxesHtml += `</div>`;
-      }
-
-      problemDiv.innerHTML = `
-        <div class="problem-header-content">
-          <div class="problem-info-text">
-            <div class="problem-number">Příklad ${displayIndex}</div>
-            <div class="problem-id">ID: ${series}/${num}</div>
-          </div>
-          <button class="show-solution" data-series="${series}" data-num="${num}">Zobrazit řešení</button>
-          ${categoryCheckboxesHtml}
-        </div>
-        <img src="files/${series}/${num}.png" alt="Úloha ${num}" />
-      `;
-      problemsDiv.appendChild(problemDiv);
-
-      if (developerModeActive) {
-        const checkboxes = problemDiv.querySelectorAll('.category-checkbox-input');
-        checkboxes.forEach(checkbox => {
-          checkbox.addEventListener('change', (e) => {
-            const series = e.target.dataset.series;
-            const num = parseInt(e.target.dataset.num);
-            const category = e.target.dataset.category;
-            const isChecked = e.target.checked;
-            handleCategoryCheckboxChange(series, num, category, isChecked);
-          });
-        });
-      }
-    });
-
-    document.getElementById("problemCount").textContent = `Počet příkladů: ${currentDisplayedProblems.length}`;
-    document.querySelectorAll('.problem .show-solution').forEach(button => {
-      button.onclick = function(event) {
-        event.stopPropagation();
-        showSolution(this.dataset.series, parseInt(this.dataset.num));
-      };
-    });
-    updateSolutionButtonState();
-    updateCategorySummary();
-    updateClassificationStatus(); // NOVÉ
+    renderProblems();
   }
 
   function showProblemById(autoScroll = false) {
-    const problemIdInput = document.getElementById("problemIdInput");
-    const problemsDiv = document.getElementById("problems");
-    const problemCountDiv = document.getElementById("problemCount");
-    problemsDiv.innerHTML = '';
+    const inputId = document.getElementById("problemIdInput").value.trim().toLowerCase();
+    if (!inputId) return;
 
-    const inputId = problemIdInput.value.trim();
-    if (!inputId) {
-      currentDisplayedProblems = [];
-      problemCountDiv.textContent = `Počet příkladů: 0`;
-      updateCategorySummary();
-      updateClassificationStatus(); // NOVÉ
-      return;
-    }
+    const found = masterProblemList.find(p => `${p.series}/${p.num}` === inputId);
 
-    const idParts = inputId.split('/');
-    if (idParts.length !== 2) {
-      currentDisplayedProblems = [];
-      problemCountDiv.textContent = `Počet příkladů: 0`;
-      updateCategorySummary();
-      updateClassificationStatus(); // NOVÉ
-      return;
-    }
-    const series = idParts[0];
-    const num = parseInt(idParts[1]);
-
-    if (isNaN(num)) {
-      currentDisplayedProblems = [];
-      problemCountDiv.textContent = `Počet příkladů: 0`;
-      updateCategorySummary();
-      updateClassificationStatus(); // NOVÉ
-      return;
-    }
-
-    const foundProblem = masterProblemList.find(p => p.series === series && p.num === num);
-
-    if (foundProblem) {
-      document.getElementById("series").selectedIndex = -1;
-      document.getElementById("topic").selectedIndex = -1;
-      document.getElementById("rangeFrom").value = '';
-      document.getElementById("rangeTo").value = '';
-      document.getElementById("randomOrderCheckbox").checked = false;
-
-      currentDisplayedProblems = [{ ...foundProblem, displayIndex: 1 }];
-
-      const problemDiv = document.createElement("div");
-      problemDiv.className = "problem";
-      problemDiv.setAttribute('data-series', foundProblem.series);
-      problemDiv.setAttribute('data-num', foundProblem.num);
-
-      let categoryCheckboxesHtml = '';
-      if (developerModeActive) {
-        categoryCheckboxesHtml = `<div class="category-checkbox-group" id="categoryCheckboxesContainer_${series}_${num}">`;
-        PROBLEM_CATEGORIES.forEach(category => {
-          const problemId = `${series}/${num}`;
-          const isChecked = problemCategoryData[problemId] && problemCategoryData[problemId].includes(category) ? 'checked' : '';
-          const uniqueId = `cat-${series}-${num}-${category.replace(/\s/g, '-')}`;
-          categoryCheckboxesHtml += `
-            <label class="category-checkbox-label">
-              <input type="checkbox" class="category-checkbox-input"
-                data-series="${series}" data-num="${num}" data-category="${category}"
-                id="${uniqueId}" ${isChecked}>
-              ${category}
-            </label>
-          `;
-        });
-        categoryCheckboxesHtml += `</div>`;
+    if (found) {
+      currentDisplayedProblems = [{ ...found, displayIndex: 1 }];
+      renderProblems();
+      if (autoScroll) {
+        document.getElementById("problems").firstElementChild?.scrollIntoView({ behavior: 'smooth' });
       }
-
-      problemDiv.innerHTML = `
-        <div class="problem-header-content">
-          <div class="problem-info-text">
-            <div class="problem-number">Příklad ${currentDisplayedProblems[0].displayIndex}</div>
-            <div class="problem-id">ID: ${foundProblem.series}/${foundProblem.num}</div>
-          </div>
-          <button class="show-solution" data-series="${foundProblem.series}" data-num="${foundProblem.num}">Zobrazit řešení</button>
-          ${categoryCheckboxesHtml}
-        </div>
-        <img src="files/${foundProblem.series}/${foundProblem.num}.png" alt="Úloha ${foundProblem.num}" />
-      `;
-      problemsDiv.appendChild(problemDiv);
-      problemCountDiv.textContent = `Počet příkladů: 1`;
-
-      if (autoScroll && problemsDiv.firstElementChild) {
-        problemsDiv.firstElementChild.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-
-      if (developerModeActive) {
-        const checkboxes = problemDiv.querySelectorAll('.category-checkbox-input');
-        checkboxes.forEach(checkbox => {
-          checkbox.addEventListener('change', (e) => {
-            const series = e.target.dataset.series;
-            const num = parseInt(e.target.dataset.num);
-            const category = e.target.dataset.category;
-            const isChecked = e.target.checked;
-            handleCategoryCheckboxChange(series, num, category, isChecked);
-          });
-        });
-      }
-    } else {
-      currentDisplayedProblems = [];
-      problemCountDiv.textContent = `Počet příkladů: 0`;
     }
-    document.querySelectorAll('.problem .show-solution').forEach(button => {
-      button.onclick = function(event) {
-        event.stopPropagation();
-        showSolution(this.dataset.series, parseInt(this.dataset.num));
-      };
-    });
-    updateSolutionButtonState();
-    updateCategorySummary();
-    updateClassificationStatus(); // NOVÉ
   }
 
   function clearFilters() {
-    const seriesSelect = document.getElementById("series");
-    const topicSelect = document.getElementById("topic");
-    const rangeFrom = document.getElementById("rangeFrom");
-    const rangeTo = document.getElementById("rangeTo");
-    const randomOrderCheckbox = document.getElementById("randomOrderCheckbox");
-    const problemIdInput = document.getElementById("problemIdInput");
-
-    seriesSelect.selectedIndex = -1;
-    topicSelect.selectedIndex = -1;
-    rangeFrom.value = '';
-    rangeTo.value = '';
-    randomOrderCheckbox.checked = false;
-
-    problemIdInput.value = '';
-    problemIdInput.classList.remove('valid-id', 'invalid-id');
-    document.getElementById("problemIdHelpText").textContent = 'Nápověda: Zadejte ID ve formátu "16j/12"';
-    document.getElementById("problemIdHelpText").classList.remove('error');
-
-    loadProblemsAndScroll();
+    document.getElementById("problemIdInput").value = '';
+    idListInput.value = '';
+    resetFilters();
   }
+
+  // --- OVERLAY & FULLSCREEN LOGIC ---
 
   function closeOverlay() {
     overlay.style.display = "none";
     overlay.style.left = '50%';
     overlay.style.top = '50%';
     overlay.style.transform = 'translate(-50%, -50%)';
-    overlayHeader.style.cursor = 'grab';
-    overlay.style.width = '';
-    overlay.style.height = '';
   }
 
   function showSolution(series, num) {
@@ -1824,10 +1846,7 @@
 
     currentProblemIndex = currentDisplayedProblems.findIndex(p => p.series === series && p.num === num);
 
-    if (currentProblemIndex === -1) {
-      console.error("Problem not found in currentDisplayedProblems for solution display:", series, num);
-      return;
-    }
+    if (currentProblemIndex === -1) return;
 
     solutionImage.src = `files/${series}/${num}_res.png`;
     overlayTitle.innerHTML = `Řešení <span class="problem-index-bold">příkladu ${currentDisplayedProblems[currentProblemIndex].displayIndex}</span> ID: ${series}/${num}`;
@@ -1838,55 +1857,49 @@
   }
 
   function navigateSolution(direction) {
-    if (currentDisplayedProblems.length === 0) return;
-
     let newIndex = currentProblemIndex;
-    if (direction === 'prev') {
-      newIndex = Math.max(0, currentProblemIndex - 1);
-    } else if (direction === 'next') {
-      newIndex = Math.min(currentDisplayedProblems.length - 1, currentProblemIndex + 1);
-    }
+    if (direction === 'prev') newIndex = Math.max(0, currentProblemIndex - 1);
+    else if (direction === 'next') newIndex = Math.min(currentDisplayedProblems.length - 1, currentProblemIndex + 1);
 
     if (newIndex !== currentProblemIndex) {
       const problem = currentDisplayedProblems[newIndex];
       showSolution(problem.series, problem.num);
-
-      const newProblemElement = document.querySelector(`.problem[data-series="${problem.series}"][data-num="${problem.num}"]`);
-      if (newProblemElement && document.fullscreenElement) {
-        prepareProblemForFullscreen(newProblemElement);
+      
+      if (document.fullscreenElement) {
+        const el = document.querySelector(`.problem[data-series="${problem.series}"][data-num="${problem.num}"]`);
+        if (el) prepareProblemForFullscreen(el);
       }
     }
   }
 
   document.getElementById("closeBtn").addEventListener("click", closeOverlay);
-
-  overlay.addEventListener("click", function(e) {
-    if (e.target === this || (e.target.closest('.overlay-content') && !e.target.closest('.overlay-header'))) {
-      closeOverlay();
-    }
-  });
-
-  document.addEventListener('click', function(e) {
-    if (overlay.style.display === 'flex' && !overlay.contains(e.target)) {
-      closeOverlay();
-    }
-  });
-
   document.getElementById("prevBtn").addEventListener("click", () => navigateSolution('prev'));
   document.getElementById("nextBtn").addEventListener("click", () => navigateSolution('next'));
 
+  // MEZERNÍK LOGIC
   document.addEventListener("keydown", function(e) {
-    const overlay = document.getElementById("overlay");
     const isOverlayOpen = overlay.style.display === "flex";
-    const isFullscreen = document.fullscreenElement;
+    const isFullscreen = !!document.fullscreenElement;
 
-    if (e.key === "Escape") {
+    // Mezerník ve fullscreenu
+    if (e.code === "Space" && isFullscreen) {
       e.preventDefault();
       if (isOverlayOpen) {
         closeOverlay();
-      } else if (isFullscreen) {
-        exitFullscreen();
+      } else if (activeProblemElement) {
+        const series = activeProblemElement.dataset.series;
+        const num = activeProblemElement.dataset.num;
+        // Pokud není časovač zamknutý
+        if (!timerRunning) {
+          showSolution(series, parseInt(num));
+        }
       }
+      return;
+    }
+
+    if (e.key === "Escape") {
+      if (isOverlayOpen) closeOverlay();
+      else if (isFullscreen) exitFullscreen();
     } else if (isFullscreen && activeProblemElement) {
       if (isOverlayOpen) {
         if (e.key === "ArrowLeft") {
@@ -1895,16 +1908,16 @@
         } else if (e.key === "ArrowRight") {
           e.preventDefault();
           navigateSolution('next');
-        } else if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+        } else if (e.key === "ArrowUp") {
           e.preventDefault();
-          closeOverlay();
-          if (e.key === "ArrowUp") {
-            navigateToPrevProblemInFullscreen();
-          } else {
-            navigateToNextProblemInFullscreen();
-          }
+          closeOverlay(); // Close solution first
+          navigateToPrevProblemInFullscreen(); // Then navigate problem
+        } else if (e.key === "ArrowDown") {
+          e.preventDefault();
+          closeOverlay(); // Close solution first
+          navigateToNextProblemInFullscreen(); // Then navigate problem
         }
-      } else {
+      } else { // Overlay is NOT open
         if (e.key === "ArrowDown") {
           e.preventDefault();
           navigateToNextProblemInFullscreen();
@@ -1917,24 +1930,496 @@
     }
   });
 
-  let lastTouchEnd = 0;
-  document.addEventListener('touchend', function (event) {
-    const now = (new Date()).getTime();
-    if (now - lastTouchEnd <= 300) {
-      event.preventDefault();
-    }
-    lastTouchEnd = now;
-  }, false);
+  function prepareProblemForFullscreen(problemElement) {
+    document.querySelectorAll('.problem').forEach(p => p.classList.add('hidden-for-fullscreen'));
+    if (activeProblemElement) activeProblemElement.classList.remove('fullscreen-active');
+    
+    activeProblemElement = problemElement;
+    activeProblemElement.classList.remove('hidden-for-fullscreen');
+    activeProblemElement.classList.add('fullscreen-active');
+    activeProblemElement.scrollTop = 0;
 
-  function toggleAdvancedFilters() {
-    const advancedFiltersDiv = document.getElementById("advancedFilters");
-    if (advancedFiltersDiv.style.display === "none" || advancedFiltersDiv.style.display === "") {
-      advancedFiltersDiv.style.display = "block";
+    showFullscreenUIAndResetHideTimer();
+    updateProgressBar();
+    updateSolutionButtonState();
+  }
+
+  function requestAndPrepareFullscreen(problemElement) {
+    lastScrollPosition = window.scrollY;
+    document.documentElement.requestFullscreen().then(() => {
+      prepareProblemForFullscreen(problemElement);
+    }).catch(err => {
+      console.error(`Chyba při pokusu o přepnutí do režimu celé obrazovky: ${err.message}`);
+      // Fallback: if fullscreen fails, still prepare the problem and show UI
+      prepareProblemForFullscreen(problemElement);
+      showFullscreenUI(); // Ensure UI is shown even if native fullscreen fails
+    });
+  }
+
+  function toggleFullscreenForFirstVisibleProblem(event) {
+    event.stopPropagation();
+    if (document.fullscreenElement) { // If already in fullscreen, do nothing
+      return;
+    }
+    const problems = Array.from(document.querySelectorAll('.problem'));
+    let firstVisible = problems.find(p => p.getBoundingClientRect().top >= 0 && p.getBoundingClientRect().bottom > 0);
+    if (firstVisible) requestAndPrepareFullscreen(firstVisible);
+  }
+
+  function exitFullscreen() {
+    if (document.fullscreenElement) document.exitFullscreen();
+  }
+
+  document.addEventListener('fullscreenchange', () => {
+    if (!document.fullscreenElement) {
+      // Exiting fullscreen
+      if (activeProblemElement) {
+        activeProblemElement.classList.remove('fullscreen-active');
+      }
+      activeProblemElement = null;
+      hideFullscreenUI(); // Hide all fullscreen UI elements and show projection button
+      updateProgressBar();
+
+      document.querySelectorAll('.problem').forEach(p => p.classList.remove('hidden-for-fullscreen'));
+
+      window.scrollTo(0, lastScrollPosition);
+
+      closeOverlay();
     } else {
-      advancedFiltersDiv.style.display = "none";
+      // Entering fullscreen
+      // Ensure the active problem element is correctly set if fullscreen was triggered by something else
+      if (document.fullscreenElement.classList.contains('problem') && document.fullscreenElement !== activeProblemElement) {
+        prepareProblemForFullscreen(document.fullscreenElement);
+      }
+      showFullscreenUI(); // Show all fullscreen UI elements and hide projection button
+    }
+    updateSolutionButtonState();
+  });
+
+  // --- PROGRESS & UI ---
+
+  function updateProgressBar() {
+    const progressBar = document.getElementById("progressBar");
+    const scrollTop = document.documentElement.scrollTop;
+    const height = document.documentElement.scrollHeight - window.innerHeight;
+    
+    if (document.fullscreenElement && activeProblemElement) {
+      progressBar.style.opacity = '1';
+      const pScroll = activeProblemElement.scrollTop;
+      const pHeight = activeProblemElement.scrollHeight - activeProblemElement.clientHeight;
+      progressBar.style.width = pHeight > 0 ? `${(pScroll / pHeight) * 100}%` : '100%';
+    } else {
+      progressBar.style.opacity = scrollTop > 200 ? '1' : '0';
+      progressBar.style.width = `${(scrollTop / height) * 100}%`;
     }
   }
 
+  function showFullscreenUI() {
+    clearTimeout(fullscreenUIHideTimeout); // Clear any pending hide
+    const nextArrow = document.getElementById('nextProblemArrow');
+    const prevArrow = document.getElementById('prevProblemArrow');
+    const problemCounter = document.getElementById('fullscreenProblemCounter');
+    const exitButton = document.getElementById('exitFullscreenButton');
+    const projectionButton = document.querySelector('.projection-button');
+    const fullscreenTimerElementLocal = document.getElementById('fullscreenTimer');
+    const fullscreenTimerControlsLocal = document.getElementById('fullscreenTimerControls');
+
+    // Show fullscreen UI elements
+    if (nextArrow) { nextArrow.style.display = 'flex'; nextArrow.style.opacity = '1'; }
+    if (prevArrow) { prevArrow.style.display = 'flex'; prevArrow.style.opacity = '1'; }
+    if (problemCounter) { updateFullscreenProblemCounter(); problemCounter.style.display = 'block'; problemCounter.style.opacity = '1'; }
+    if (fullscreenTimerElementLocal) { fullscreenTimerElementLocal.style.display = 'block'; fullscreenTimerElementLocal.style.opacity = '1'; }
+    if (fullscreenTimerControlsLocal) { fullscreenTimerControlsLocal.style.display = 'flex'; fullscreenTimerControlsLocal.style.opacity = '1'; }
+    if (exitButton) { exitButton.style.display = 'flex'; exitButton.style.opacity = '1'; } // Ensure opacity is 1
+
+    // Hide non-fullscreen UI elements
+    if (projectionButton) { projectionButton.style.display = 'none'; }
+
+    // Set disabled state for arrows
+    const activeProblemSeries = activeProblemElement ? activeProblemElement.dataset.series : null;
+    const activeProblemNum = activeProblemElement ? parseInt(activeProblemElement.dataset.num) : null;
+    const currentProblemDataIndex = currentDisplayedProblems.findIndex(p => p.series === activeProblemSeries && p.num === activeProblemNum);
+    if (nextArrow) nextArrow.disabled = currentProblemDataIndex >= currentDisplayedProblems.length - 1;
+    if (prevArrow) prevArrow.disabled = currentProblemDataIndex <= 0;
+
+    hideFullscreenUIDelayed(); // Start timer to fade out
+  }
+
+  function hideFullscreenUI() {
+    clearTimeout(fullscreenUIHideTimeout); // Clear any pending hide
+    const nextArrow = document.getElementById('nextProblemArrow');
+    const prevArrow = document.getElementById('prevProblemArrow');
+    const problemCounter = document.getElementById('fullscreenProblemCounter');
+    const exitButton = document.getElementById('exitFullscreenButton');
+    const projectionButton = document.querySelector('.projection-button');
+    const fullscreenTimerElementLocal = document.getElementById('fullscreenTimer');
+    const fullscreenTimerControlsLocal = document.getElementById('fullscreenTimerControls');
+
+    // Hide fullscreen UI elements immediately
+    if (nextArrow) { nextArrow.style.display = 'none'; nextArrow.style.opacity = '0'; }
+    if (prevArrow) { prevArrow.style.display = 'none'; prevArrow.style.opacity = '0'; }
+    if (problemCounter) { problemCounter.style.display = 'none'; problemCounter.style.opacity = '0'; }
+    if (fullscreenTimerElementLocal) { fullscreenTimerElementLocal.style.display = 'none'; fullscreenTimerElementLocal.style.opacity = '0'; }
+    if (fullscreenTimerControlsLocal) { fullscreenTimerControlsLocal.style.display = 'none'; fullscreenTimerControlsLocal.style.opacity = '0'; }
+    if (exitButton) { exitButton.style.display = 'none'; exitButton.style.opacity = '0'; }
+
+    // Show non-fullscreen UI elements
+    if (projectionButton) { projectionButton.style.display = 'flex'; }
+  }
+
+  function showFullscreenUIAndResetHideTimer() {
+    clearTimeout(fullscreenUIHideTimeout);
+    const prevArrow = document.getElementById('prevProblemArrow');
+    const nextArrow = document.getElementById('nextProblemArrow');
+    const problemCounter = document.getElementById('fullscreenProblemCounter');
+    const fullscreenTimerElementLocal = document.getElementById('fullscreenTimer');
+    const fullscreenTimerControlsLocal = document.getElementById('fullscreenTimerControls');
+    const exitButton = document.getElementById('exitFullscreenButton');
+
+    if (prevArrow) { prevArrow.style.display = 'flex'; prevArrow.style.opacity = '1'; }
+    if (nextArrow) { nextArrow.style.display = 'flex'; nextArrow.style.opacity = '1'; }
+    if (problemCounter) { 
+      updateFullscreenProblemCounter();
+      problemCounter.style.display = 'block'; 
+      problemCounter.style.opacity = '1';
+    }
+    if (fullscreenTimerElementLocal) { fullscreenTimerElementLocal.style.display = 'block'; fullscreenTimerElementLocal.style.opacity = '1'; }
+    if (fullscreenTimerControlsLocal) { fullscreenTimerControlsLocal.style.display = 'flex'; fullscreenTimerControlsLocal.style.opacity = '1'; }
+    if (exitButton) { exitButton.style.display = 'flex'; exitButton.style.opacity = '1'; }
+
+    // Set disabled state for arrows
+    const activeProblemSeries = activeProblemElement ? activeProblemElement.dataset.series : null;
+    const activeProblemNum = activeProblemElement ? parseInt(activeProblemElement.dataset.num) : null;
+    const currentProblemDataIndex = currentDisplayedProblems.findIndex(p => p.series === activeProblemSeries && p.num === activeProblemNum);
+    if (nextArrow) nextArrow.disabled = currentProblemDataIndex >= currentDisplayedProblems.length - 1;
+    if (prevArrow) prevArrow.disabled = currentProblemDataIndex <= 0;
+
+    hideFullscreenUIDelayed();
+  }
+
+  function hideFullscreenUIDelayed() {
+    clearTimeout(fullscreenUIHideTimeout);
+    fullscreenUIHideTimeout = setTimeout(() => {
+      const prevArrow = document.getElementById('prevProblemArrow');
+      const nextArrow = document.getElementById('nextProblemArrow');
+      const problemCounter = document.getElementById('fullscreenProblemCounter');
+      const fullscreenTimerElementLocal = document.getElementById('fullscreenTimer');
+      const fullscreenTimerControlsLocal = document.getElementById('fullscreenTimerControls');
+      const exitButton = document.getElementById('exitFullscreenButton');
+
+      if (prevArrow) prevArrow.style.opacity = '0';
+      if (nextArrow) nextArrow.style.opacity = '0';
+      if (problemCounter) problemCounter.style.opacity = '0';
+      if (fullscreenTimerElementLocal) fullscreenTimerElementLocal.style.opacity = '0';
+      if (fullscreenTimerControlsLocal) fullscreenTimerControlsLocal.style.opacity = '0';
+      if (exitButton) exitButton.style.opacity = '0';
+    }, UI_HIDE_DELAY);
+  }
+
+  function navigateToNextProblemInFullscreen() {
+    if (!activeProblemElement || !document.fullscreenElement || currentDisplayedProblems.length === 0) {
+      return;
+    }
+    const idx = currentDisplayedProblems.findIndex(p => p.series === activeProblemElement.dataset.series && p.num == activeProblemElement.dataset.num);
+    if (idx < currentDisplayedProblems.length - 1) {
+      const next = currentDisplayedProblems[idx + 1];
+      const el = document.querySelector(`.problem[data-series="${next.series}"][data-num="${next.num}"]`);
+      if (el) {
+        const wasOverlayOpen = overlay.style.display === 'flex';
+        prepareProblemForFullscreen(el);
+        if (wasOverlayOpen) {
+          showSolution(next.series, next.num);
+        }
+      }
+    }
+  }
+
+  function navigateToPrevProblemInFullscreen() {
+    if (!activeProblemElement || !document.fullscreenElement || currentDisplayedProblems.length === 0) {
+      return;
+    }
+    const idx = currentDisplayedProblems.findIndex(p => p.series === activeProblemElement.dataset.series && p.num == activeProblemElement.dataset.num);
+    if (idx > 0) {
+      const prev = currentDisplayedProblems[idx - 1];
+      const el = document.querySelector(`.problem[data-series="${prev.series}"][data-num="${prev.num}"]`);
+      if (el) {
+        const wasOverlayOpen = overlay.style.display === 'flex';
+        prepareProblemForFullscreen(el);
+        if (wasOverlayOpen) {
+          showSolution(prev.series, prev.num);
+        }
+      }
+    }
+  }
+
+  function updateFullscreenProblemCounter() {
+    const problemCounter = document.getElementById('fullscreenProblemCounter');
+    if (!document.fullscreenElement || !activeProblemElement || !problemCounter) {
+      return;
+    }
+    const activeProblemSeries = activeProblemElement.dataset.series;
+    const activeProblemNum = parseInt(activeProblemElement.dataset.num, 10);
+    const currentProblemData = currentDisplayedProblems.find(p =>
+      p.series === activeProblemSeries && p.num === activeProblemNum
+    );
+    if (currentProblemData) {
+      problemCounter.textContent = `${currentProblemData.displayIndex}/${currentDisplayedProblems.length}`;
+    } else {
+      problemCounter.textContent = `?/${currentDisplayedProblems.length}`;
+    }
+  }
+
+  // --- TIMER & DEV MODE ---
+
+  function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+  }
+
+  function updateTimerDisplay() {
+    fullscreenTimerElement.textContent = formatTime(timerSeconds);
+  }
+
+  function toggleTimer() {
+    timerRunning = !timerRunning;
+    playPauseTimerBtn.innerHTML = timerRunning ? '&#10074;&#10074;' : '&#9658;';
+    if (timerRunning) {
+      timerInterval = setInterval(() => {
+        timerSeconds--;
+        updateTimerDisplay();
+        if (timerSeconds <= 0) clearInterval(timerInterval);
+      }, 1000);
+    } else {
+      clearInterval(timerInterval);
+    }
+    updateSolutionButtonState();
+  }
+
+  function updateSolutionButtonState() {
+    document.querySelectorAll('.problem .show-solution').forEach(btn => {
+      if (timerRunning && btn.closest('.fullscreen-active')) {
+        btn.classList.add('locked');
+        btn.disabled = true;
+      } else {
+        btn.classList.remove('locked');
+        btn.disabled = false;
+      }
+    });
+  }
+
+  function toggleDeveloperMode() {
+    developerModeActive = developerModeCheckbox.checked;
+    localStorage.setItem('developerModeActive', developerModeActive);
+    renderProblems();
+  }
+
+  function handleCategoryCheckboxChange(series, num, category, isChecked) {
+    const id = `${series}/${num}`;
+    if (!problemCategoryData[id]) problemCategoryData[id] = [];
+    if (isChecked) {
+      if (!problemCategoryData[id].includes(category)) problemCategoryData[id].push(category);
+    } else {
+      problemCategoryData[id] = problemCategoryData[id].filter(c => c !== category);
+    }
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(problemCategoryData));
+    updateCategorySummary();
+    updateClassificationStatus();
+  }
+
+  function updateCategorySummary() {
+    if (!developerModeActive) {
+      developerModeSummary.style.display = 'none';
+      return;
+    }
+    developerModeSummary.style.display = 'block';
+    let text = "";
+    PROBLEM_CATEGORIES.forEach(cat => {
+      for (let series in problemsCount) {
+        const nums = [];
+        for (let id in problemCategoryData) {
+          if (id.startsWith(series + "/") && problemCategoryData[id].includes(cat)) {
+            nums.push(id.split("/")[1]);
+          }
+        }
+        if (nums.length > 0) {
+          text += `"${series}": [${nums.sort((a,b)=>a-b).join(",")}] //${cat}\n`;
+        }
+      }
+    });
+    categorySummaryContent.textContent = text || "Žádná data";
+  }
+
+  function updateClassificationStatus() {
+    if (!developerModeActive || currentDisplayedProblems.length === 0) {
+      classificationStatusDiv.style.display = 'none';
+      return;
+    }
+    const unclassified = currentDisplayedProblems.filter(p => !problemCategoryData[`${p.series}/${p.num}`] || problemCategoryData[`${p.series}/${p.num}`].length === 0);
+    classificationStatusDiv.style.display = 'block';
+    if (unclassified.length === 0) {
+      classificationStatusDiv.className = 'all-classified';
+      classificationStatusDiv.textContent = 'Všechny příklady jsou zatříděny.';
+    } else {
+      classificationStatusDiv.className = 'not-all-classified';
+      classificationStatusDiv.textContent = `Nezatříděno: ${unclassified.map(u => u.displayIndex).join(', ')}`;
+    }
+  }
+
+  function toggleAdvancedFilters() {
+    const adv = document.getElementById("advancedFilters");
+    adv.style.display = adv.style.display === "block" ? "none" : "block";
+  }
+
+  // --- INIT ---
+
+  document.addEventListener('DOMContentLoaded', () => {
+    generateMasterProblemList();
+    
+    // Načíst špendlíky
+    const storedPinned = localStorage.getItem(PINNED_STORAGE_KEY);
+    if (storedPinned) pinnedProblems = new Set(JSON.parse(storedPinned));
+    updatePinnedUI();
+
+    // Načíst dev data
+    const storedDev = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (storedDev) problemCategoryData = JSON.parse(storedDev);
+    developerModeActive = localStorage.getItem('developerModeActive') === 'true';
+    developerModeCheckbox.checked = developerModeActive;
+
+    window.addEventListener('scroll', updateProgressBar);
+    window.addEventListener('resize', updateProjectionButtonPosition); // Ensure button position updates on resize
+    
+    document.getElementById('playPauseTimerBtn').onclick = toggleTimer;
+    document.getElementById('resetTimerBtn').onclick = () => {
+      timerSeconds = 8100;
+      updateTimerDisplay(); // Update display after reset
+      updateSolutionButtonState(); // Update button state after reset
+    };
+
+    // Add click listeners for fullscreen navigation arrows
+    const nextProblemArrow = document.getElementById('nextProblemArrow');
+    if (nextProblemArrow) {
+      nextProblemArrow.addEventListener('click', () => {
+        navigateToNextProblemInFullscreen();
+        showFullscreenUIAndResetHideTimer(); 
+      });
+    }
+    const prevProblemArrow = document.getElementById('prevProblemArrow');
+    if (prevProblemArrow) {
+      prevProblemArrow.addEventListener('click', () => {
+        navigateToPrevProblemInFullscreen();
+        showFullscreenUIAndResetHideTimer(); 
+      });
+    }
+
+    // --- URL PARAMETER LOADING LOGIC ---
+    const urlSearch = window.location.search;
+    let idsFromUrl = null;
+
+    if (urlSearch.startsWith('?=')) {
+      idsFromUrl = urlSearch.substring(2); // Get string after '?='
+    }
+
+    if (idsFromUrl && idsFromUrl.trim() !== '') {
+      const ids = idsFromUrl.split(',').map(s => s.trim().toLowerCase()).filter(s => s !== '');
+      const filtered = [];
+      ids.forEach(id => {
+        const found = masterProblemList.find(p => `${p.series}/${p.num}` === id);
+        if (found) filtered.push(found);
+      });
+      currentDisplayedProblems = filtered.map((p, i) => ({ ...p, displayIndex: i + 1 }));
+      renderProblems();
+      idListInput.value = idsFromUrl; // Pre-fill the input field with URL IDs
+      // Clear other filters to reflect that URL is dominant
+      document.getElementById("series").selectedIndex = -1;
+      document.getElementById("topic").selectedIndex = -1;
+      document.getElementById("rangeFrom").value = '';
+      document.getElementById("rangeTo").value = '';
+      document.getElementById("problemIdInput").value = '';
+      document.getElementById("randomOrderCheckbox").checked = false;
+
+      // NEW: Scroll to the first problem if loaded from URL
+      const problemsDiv = document.getElementById("problems");
+      if (problemsDiv.firstElementChild) {
+        problemsDiv.firstElementChild.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+    } else {
+      // Normal loading if no URL parameter
+      loadProblems();
+    }
+
+    updateProjectionButtonPosition();
+    updateTimerDisplay();
+    updateSolutionButtonState();
+    updateCategorySummary();
+    updateClassificationStatus();
+    hideFullscreenUI(); // Ensure fullscreen UI is hidden initially
+  });
+
+  // Dragging overlay logic (from previous version, ensuring it's still present and correct)
+  overlayHeader.addEventListener('mousedown', (e) => {
+    if (e.button === 0) {
+      isDraggingOverlay = true;
+      const rect = overlay.getBoundingClientRect();
+      overlayDragOffsetX = e.clientX - rect.left;
+      overlayDragOffsetY = e.clientY - rect.top;
+      overlayHeader.style.cursor = 'grabbing';
+      overlay.style.transition = 'none';
+      overlay.style.width = `${rect.width}px`;
+      overlay.style.height = `${rect.height}px`;
+    }
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (isDraggingOverlay) {
+      e.preventDefault();
+      overlay.style.left = `${e.clientX - overlayDragOffsetX}px`;
+      overlay.style.top = `${e.clientY - overlayDragOffsetY}px`;
+      overlay.style.transform = 'none';
+    } else if (document.fullscreenElement && activeProblemElement) { // Mouse movement for fullscreen UI visibility
+      const viewportHeight = window.innerHeight;
+      const viewportWidth = window.innerWidth;
+      const mouseY = e.clientY;
+      const mouseX = e.clientX;
+      const activationZone = 100;
+
+      if (mouseY < activationZone || mouseY > viewportHeight - activationZone ||
+          mouseX < activationZone || mouseX > viewportWidth - activationZone) {
+        showFullscreenUIAndResetHideTimer();
+      } else {
+        hideFullscreenUIDelayed();
+      }
+    }
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (isDraggingOverlay) {
+      isDraggingOverlay = false;
+      overlayHeader.style.cursor = 'grab';
+      overlay.style.transition = '';
+      overlay.style.width = '';
+      overlay.style.height = '';
+    }
+  });
+  overlayHeader.style.cursor = 'grab'; // Ensure initial grab cursor
+
+  // Ensure projection button position is updated on scroll and resize
+  function updateProjectionButtonPosition() {
+    const projectionButton = document.querySelector('.projection-button');
+    const header = document.querySelector('header');
+    if (projectionButton && header) {
+      const headerBottom = header.getBoundingClientRect().bottom;
+      const newTop = Math.max(20, headerBottom + 10);
+      projectionButton.style.top = `${newTop}px`;
+    }
+  }
+
+  // Initial call to set position
+  updateProjectionButtonPosition();
+
+  // Event listeners for input validation and clearing
   document.getElementById("rangeFrom").addEventListener("focus", function() {
     this.value = '';
   });
@@ -1970,7 +2455,7 @@
       document.getElementById("problems").innerHTML = '';
       document.getElementById("problemCount").textContent = `Počet příkladů: 0`;
       updateCategorySummary();
-      updateClassificationStatus(); // NOVÉ
+      updateClassificationStatus();
       return;
     }
 
@@ -1981,7 +2466,9 @@
       problemIdInput.classList.add('valid-id');
       showProblemById(true);
     } else if (prefixMatch) {
-    } else {
+      // Do nothing, allow partial input
+    }
+    else {
       problemIdInput.classList.add('invalid-id');
       problemIdHelpText.textContent = 'Neexistující ID';
       problemIdHelpText.classList.add('error');
@@ -1990,7 +2477,7 @@
       document.getElementById("problemCount").textContent = `Počet příkladů: 0`;
     }
     updateCategorySummary();
-    updateClassificationStatus(); // NOVÉ
+    updateClassificationStatus();
   }
 
   function clearProblemIdInput() {
@@ -2007,300 +2494,7 @@
   });
   clearIdInputBtn.addEventListener('click', clearProblemIdInput);
 
-  function updateProgressBar() {
-    const progressBar = document.getElementById("progressBar");
-    const filtersSection = document.querySelector(".filters-section");
-    const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-    const clientHeight = window.innerHeight;
-
-    if (document.fullscreenElement && activeProblemElement && activeProblemElement.classList.contains('fullscreen-active')) {
-      progressBar.style.opacity = '1';
-
-      const problemScrollTop = activeProblemElement.scrollTop;
-      const problemScrollHeight = activeProblemElement.scrollHeight;
-      const problemClientHeight = activeProblemElement.clientHeight;
-
-      let scrollPercentage = 0;
-      if (problemScrollHeight > problemClientHeight) {
-        scrollPercentage = (problemScrollTop / (problemScrollHeight - problemClientHeight)) * 100;
-      } else {
-        scrollPercentage = 100;
-      }
-
-      scrollPercentage = Math.max(0, Math.min(100, scrollPercentage));
-      progressBar.style.width = `${scrollPercentage}%`;
-      return;
-    }
-
-    if (!filtersSection) {
-      progressBar.style.opacity = '0';
-      return;
-    }
-
-    const startPoint = filtersSection.offsetTop + filtersSection.offsetHeight;
-
-    if (scrollTop < startPoint) {
-      progressBar.style.opacity = '0';
-      progressBar.style.width = '0%';
-      return;
-    }
-
-    progressBar.style.opacity = '1';
-
-    const scrollHeightAfterFilters = document.documentElement.scrollHeight - startPoint;
-    const totalScrollableHeightForProblems = scrollHeightAfterFilters - clientHeight;
-
-    if (totalScrollableHeightForProblems > 0) {
-      const scrollProgress = scrollTop - startPoint;
-      let scrollPercentage = (scrollProgress / totalScrollableHeightForProblems) * 100;
-      scrollPercentage = Math.max(0, Math.min(100, scrollPercentage));
-      progressBar.style.width = `${scrollPercentage}%`;
-    } else {
-      progressBar.style.width = '100%';
-    }
-  }
-
-  function prepareProblemForFullscreen(problemElement) {
-    const allProblems = document.querySelectorAll('.problem');
-
-    allProblems.forEach(p => p.classList.add('hidden-for-fullscreen'));
-
-    if (activeProblemElement && activeProblemElement !== problemElement) {
-      activeProblemElement.classList.remove('fullscreen-active');
-    }
-
-    activeProblemElement = problemElement;
-    activeProblemElement.classList.remove('hidden-for-fullscreen');
-    activeProblemElement.classList.add('fullscreen-active');
-    activeProblemElement.scrollTop = 0;
-
-    showFullscreenUIAndResetHideTimer();
-    updateProgressBar();
-    updateSolutionButtonState();
-  }
-
-  function requestAndPrepareFullscreen(problemElement) {
-    if (document.documentElement.requestFullscreen) {
-      lastScrollPosition = window.scrollY;
-      document.documentElement.requestFullscreen().then(() => {
-        if (screen.orientation && screen.orientation.lock) {
-          screen.orientation.lock('landscape').catch(err => {
-            console.warn("Nepodařilo se uzamknout orientaci obrazovky na landscape:", err);
-          });
-        }
-        prepareProblemForFullscreen(problemElement);
-      }).catch(err => {
-        console.error(`Chyba při pokusu o přepnutí do režimu celé obrazovky: ${err.message}`);
-        prepareProblemForFullscreen(problemElement);
-        hideFullscreenUI();
-      });
-    } else {
-      alert("Váš prohlížeč nepodporuje režim celé obrazovky.");
-      prepareProblemForFullscreen(problemElement);
-      hideFullscreenUI();
-    }
-  }
-
-  function toggleFullscreenForFirstVisibleProblem(event) {
-    event.stopPropagation();
-
-    if (document.fullscreenElement) {
-      return;
-    }
-
-    const problems = Array.from(document.querySelectorAll('.problem'));
-    let firstVisibleProblem = null;
-
-    for (const problem of problems) {
-      const rect = problem.getBoundingClientRect();
-      if (rect.top >= 0 && rect.top < window.innerHeight) {
-        firstVisibleProblem = problem;
-        break;
-      }
-    }
-
-    if (firstVisibleProblem) {
-      requestAndPrepareFullscreen(firstVisibleProblem);
-    } else {
-      alert("Není viditelný žádný příklad k zobrazení na celou obrazovku.");
-    }
-  }
-
-  function updateFullscreenProblemCounter() {
-    const problemCounter = document.getElementById('fullscreenProblemCounter');
-    if (!document.fullscreenElement || !activeProblemElement || !problemCounter) {
-      return;
-    }
-    const activeProblemSeries = activeProblemElement.dataset.series;
-    const activeProblemNum = parseInt(activeProblemElement.dataset.num, 10);
-    const currentProblemData = currentDisplayedProblems.find(p =>
-      p.series === activeProblemSeries && p.num === activeProblemNum
-    );
-    if (currentProblemData) {
-      problemCounter.textContent = `${currentProblemData.displayIndex}/${currentDisplayedProblems.length}`;
-    } else {
-      problemCounter.textContent = `?/${currentDisplayedProblems.length}`;
-    }
-  }
-
-  function showFullscreenUI() {
-    const nextArrow = document.getElementById('nextProblemArrow');
-    const prevArrow = document.getElementById('prevProblemArrow');
-    const problemCounter = document.getElementById('fullscreenProblemCounter');
-    const exitButton = document.getElementById('exitFullscreenButton');
-    const projectionButton = document.querySelector('.projection-button');
-
-    const activeProblemSeries = activeProblemElement ? activeProblemElement.dataset.series : null;
-    const activeProblemNum = activeProblemElement ? parseInt(activeProblemElement.dataset.num) : null;
-    const currentProblemDataIndex = currentDisplayedProblems.findIndex(p => p.series === activeProblemSeries && p.num === activeProblemNum);
-
-    if (nextArrow) {
-      nextArrow.style.display = 'block';
-      nextArrow.disabled = currentProblemDataIndex >= currentDisplayedProblems.length - 1;
-      nextArrow.style.opacity = '1';
-    }
-    if (prevArrow) {
-      prevArrow.style.display = 'block';
-      prevArrow.disabled = currentProblemDataIndex <= 0;
-      prevArrow.style.opacity = '1';
-    }
-    if (problemCounter) {
-      updateFullscreenProblemCounter();
-      problemCounter.style.display = 'block';
-    }
-    if (fullscreenTimerElement) {
-      fullscreenTimerElement.style.display = 'block';
-      fullscreenTimerElement.style.opacity = '1';
-    }
-    if (fullscreenTimerControls) {
-      fullscreenTimerControls.style.display = 'flex';
-      fullscreenTimerControls.style.opacity = '1';
-    }
-
-    if (projectionButton) {
-      projectionButton.style.display = 'none';
-    }
-    if (exitButton) {
-      exitButton.style.display = 'flex';
-    }
-
-    hideFullscreenUIDelayed();
-  }
-
-  function hideFullscreenUI() {
-    clearTimeout(fullscreenUIHideTimeout);
-    const nextArrow = document.getElementById('nextProblemArrow');
-    const prevArrow = document.getElementById('prevProblemArrow');
-    const problemCounter = document.getElementById('fullscreenProblemCounter');
-    const exitButton = document.getElementById('exitFullscreenButton');
-    const projectionButton = document.querySelector('.projection-button');
-    const fullscreenTimerElementLocal = document.getElementById('fullscreenTimer');
-    const fullscreenTimerControlsLocal = document.getElementById('fullscreenTimerControls');
-
-    if (nextArrow) nextArrow.style.opacity = '0';
-    if (prevArrow) prevArrow.style.opacity = '0';
-    if (fullscreenTimerElementLocal) fullscreenTimerElementLocal.style.opacity = '0';
-    if (fullscreenTimerControlsLocal) fullscreenTimerControlsLocal.style.opacity = '0';
-
-    setTimeout(() => {
-      if (nextArrow) nextArrow.style.display = 'none';
-      if (prevArrow) prevArrow.style.display = 'none';
-      if (problemCounter) problemCounter.style.display = 'none';
-      if (fullscreenTimerElementLocal) fullscreenTimerElementLocal.style.display = 'none';
-      if (fullscreenTimerControlsLocal) fullscreenTimerControlsLocal.style.display = 'none';
-
-      if (exitButton) exitButton.style.display = 'none';
-      if (projectionButton) projectionButton.style.display = 'flex';
-    }, 300);
-  }
-
-  function navigateToPrevProblemInFullscreen() {
-    if (!activeProblemElement || !document.fullscreenElement || currentDisplayedProblems.length === 0) {
-      return;
-    }
-
-    const currentSeries = activeProblemElement.dataset.series;
-    const currentNum = parseInt(activeProblemElement.dataset.num);
-
-    const currentProblemDataIndex = currentDisplayedProblems.findIndex(p => p.series === currentSeries && p.num === currentNum);
-
-    if (currentProblemDataIndex <= 0) {
-      return;
-    }
-
-    const prevProblemData = currentDisplayedProblems[currentProblemDataIndex - 1];
-    if (prevProblemData) {
-      const prevProblemElement = document.querySelector(`.problem[data-series="${prevProblemData.series}"][data-num="${prevProblemData.num}"]`);
-      if (prevProblemElement) {
-        prepareProblemForFullscreen(prevProblemElement);
-        showFullscreenUIAndResetHideTimer();
-
-        if (overlay.style.display === 'flex') {
-          showSolution(prevProblemData.series, prevProblemData.num);
-        }
-      }
-    }
-  }
-
-  function navigateToNextProblemInFullscreen() {
-    if (!activeProblemElement || !document.fullscreenElement || currentDisplayedProblems.length === 0) {
-      return;
-    }
-
-    const currentSeries = activeProblemElement.dataset.series;
-    const currentNum = parseInt(activeProblemElement.dataset.num);
-
-    const currentProblemDataIndex = currentDisplayedProblems.findIndex(p => p.series === currentSeries && p.num === currentNum);
-
-    if (currentProblemDataIndex === -1 || currentProblemDataIndex >= currentDisplayedProblems.length - 1) {
-      return;
-    }
-
-    const nextProblemData = currentDisplayedProblems[currentProblemDataIndex + 1];
-    if (nextProblemData) {
-      const nextProblemElement = document.querySelector(`.problem[data-series="${nextProblemData.series}"][data-num="${nextProblemData.num}"]`);
-      if (nextProblemElement) {
-        prepareProblemForFullscreen(nextProblemElement);
-        showFullscreenUIAndResetHideTimer();
-
-        if (overlay.style.display === 'flex') {
-          showSolution(nextProblemData.series, nextProblemData.num);
-        }
-      }
-    }
-  }
-
-  function exitFullscreen() {
-    document.exitFullscreen();
-  }
-
-  document.addEventListener('fullscreenchange', () => {
-    if (!document.fullscreenElement) {
-      if (activeProblemElement) {
-        activeProblemElement.classList.remove('fullscreen-active');
-      }
-      activeProblemElement = null;
-      hideFullscreenUI();
-      updateProgressBar();
-
-      document.querySelectorAll('.problem').forEach(p => p.classList.remove('hidden-for-fullscreen'));
-
-      window.scrollTo(0, lastScrollPosition);
-
-      closeOverlay();
-
-      if (screen.orientation && screen.orientation.unlock) {
-        screen.orientation.unlock();
-      }
-    } else {
-      if (document.fullscreenElement.classList.contains('problem') && document.fullscreenElement !== activeProblemElement) {
-        prepareProblemForFullscreen(document.fullscreenElement);
-      }
-      showFullscreenUI();
-    }
-    updateSolutionButtonState();
-  });
-
+  // Touch event listeners for fullscreen UI (from previous version)
   document.addEventListener('touchstart', function(e) {
     if (document.fullscreenElement && activeProblemElement && e.touches.length === 1) {
       touchStartX = e.touches[0].clientX;
@@ -2308,474 +2502,26 @@
     }
   }, { passive: true });
 
-  document.addEventListener('touchmove', function(e) {
-  }, { passive: true });
-
   document.addEventListener('touchend', function(e) {
-    if (document.fullscreenElement && activeProblemElement && e.changedTouches.length === 1) {
-      const touchEndX = e.changedTouches[0].clientX;
-      const touchEndY = e.changedTouches[0].clientY;
-
-      const deltaX = touchEndX - touchStartX;
-      const deltaY = touchEndY - touchStartY;
-    }
-    touchStartX = 0;
-    touchStartY = 0;
     if (document.fullscreenElement && activeProblemElement) {
       showFullscreenUIAndResetHideTimer();
     }
   });
 
-  overlayHeader.addEventListener('mousedown', (e) => {
-    if (e.button === 0) {
-      isDraggingOverlay = true;
-      const rect = overlay.getBoundingClientRect();
-      overlayDragOffsetX = e.clientX - rect.left;
-      overlayDragOffsetY = e.clientY - rect.top;
-      overlayHeader.style.cursor = 'grabbing';
-      overlay.style.transition = 'none';
-      overlay.style.width = `${rect.width}px`;
-      overlay.style.height = `${rect.height}px`;
-    }
-  });
-
-  document.addEventListener('mousemove', (e) => {
-    if (isDraggingOverlay) {
-      e.preventDefault();
-      overlay.style.left = `${e.clientX - overlayDragOffsetX}px`;
-      overlay.style.top = `${e.clientY - overlayDragOffsetY}px`;
-      overlay.style.transform = 'none';
-    }
-  });
-
-  document.addEventListener('mouseup', () => {
-    if (isDraggingOverlay) {
-      isDraggingOverlay = false;
-      overlayHeader.style.cursor = 'grab';
-      overlay.style.transition = '';
-      overlay.style.width = '';
-      overlay.style.height = '';
-    }
-  });
-  overlayHeader.style.cursor = 'grab';
-
-  function hideFullscreenUIDelayed() {
-    clearTimeout(fullscreenUIHideTimeout);
-    fullscreenUIHideTimeout = setTimeout(() => {
-      const prevArrow = document.getElementById('prevProblemArrow');
-      const nextArrow = document.getElementById('nextProblemArrow');
-      if (prevArrow) prevArrow.style.opacity = '0';
-      if (nextArrow) nextArrow.style.opacity = '0';
-      if (fullscreenTimerElement) fullscreenTimerElement.style.opacity = '0';
-      if (fullscreenTimerControls) fullscreenTimerControls.style.opacity = '0';
-    }, UI_HIDE_DELAY);
-  }
-
-  function showFullscreenUIAndResetHideTimer() {
-    clearTimeout(fullscreenUIHideTimeout);
-    const prevArrow = document.getElementById('prevProblemArrow');
-    const nextArrow = document.getElementById('nextProblemArrow');
-    if (prevArrow) {
-      prevArrow.style.display = 'block';
-      prevArrow.style.opacity = '1';
-    }
-    if (nextArrow) {
-      nextArrow.style.display = 'block';
-      nextArrow.style.opacity = '1';
-    }
-    if (fullscreenTimerElement) {
-      fullscreenTimerElement.style.display = 'block';
-      fullscreenTimerElement.style.opacity = '1';
-    }
-    if (fullscreenTimerControls) {
-      fullscreenTimerControls.style.display = 'flex';
-      fullscreenTimerControls.style.opacity = '1';
-    }
-    updateFullscreenProblemCounter();
-    hideFullscreenUIDelayed();
-  }
-
-  document.addEventListener('mousemove', (e) => {
-    if (document.fullscreenElement && activeProblemElement) {
-      const viewportHeight = window.innerHeight;
-      const viewportWidth = window.innerWidth;
-      const mouseY = e.clientY;
-      const mouseX = e.clientX;
-      const activationZone = 100;
-
-      if (mouseY < activationZone || mouseY > viewportHeight - activationZone ||
-          (mouseX < activationZone + (fullscreenTimerElement.offsetWidth || 0) + (fullscreenTimerControls.offsetWidth || 0) + 20 && mouseY > viewportHeight - activationZone)) {
-        showFullscreenUIAndResetHideTimer();
-      } else {
-        hideFullscreenUIDelayed();
-      }
-    }
-  });
-
-  document.addEventListener('click', (e) => {
-    if (document.fullscreenElement && activeProblemElement) {
-      showFullscreenUIAndResetHideTimer();
-    }
-  });
-
-  function formatTime(seconds) {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
-  }
-
-  function updateTimerDisplay() {
-    fullscreenTimerElement.textContent = formatTime(timerSeconds);
-  }
-
-  function showFullscreenAlert(message, duration, callback = null) {
-    fullscreenAlertOverlay.textContent = message;
-    fullscreenAlertOverlay.style.display = 'flex';
-    fullscreenAlertOverlay.classList.add('active');
-
-    clearTimeout(fullscreenUIHideTimeout);
-    showFullscreenUI();
-
-    setTimeout(() => {
-      fullscreenAlertOverlay.style.display = 'none';
-      fullscreenAlertOverlay.classList.remove('active');
-      if (callback) callback();
-      hideFullscreenUIDelayed();
-    }, duration);
-  }
-
-  function startTimerCountdown() {
-    if (timerInterval) clearInterval(timerInterval);
-    timerInterval = setInterval(() => {
-      if (fullscreenAlertOverlay.classList.contains('active')) {
-        return;
-      }
-
-      timerSeconds--;
-      updateTimerDisplay();
-
-      if (timerSeconds === 600 && !twoMinuteAlertShown) {
-        twoMinuteAlertShown = true;
-        showFullscreenAlert("10 minut do konce", 10000);
-      }
-
-      if (timerSeconds <= 0) {
-        clearInterval(timerInterval);
-        timerRunning = false;
-        playPauseTimerBtn.innerHTML = '&#9658;';
-        showFullscreenAlert("KONEC, za 10s si budete moci zkontrolovat výsledky", 10000, () => {
-          if (currentDisplayedProblems.length > 0) {
-            const firstProblem = currentDisplayedProblems[0];
-            const firstProblemElement = document.querySelector(`.problem[data-series="${firstProblem.series}"][data-num="${firstProblem.num}"]`);
-            if (firstProblemElement) {
-              prepareProblemForFullscreen(firstProblemElement);
-            }
-            showSolution(firstProblem.series, firstProblem.num);
-            showFullscreenUI();
-          }
-        });
-      }
-      updateSolutionButtonState();
-    }, 1000);
-  }
-
-  function toggleTimer() {
-    if (timerRunning) {
-      clearInterval(timerInterval);
-      timerRunning = false;
-      playPauseTimerBtn.innerHTML = '&#9658;';
-    } else {
-      timerRunning = true;
-      playPauseTimerBtn.innerHTML = '&#10074;&#10074;';
-      startTimerCountdown();
-    }
-    updateSolutionButtonState();
-    showFullscreenUIAndResetHideTimer();
-  }
-
-  function resetTimer() {
-    clearInterval(timerInterval);
-    timerSeconds = 8100;
-    timerRunning = false;
-    twoMinuteAlertShown = false;
-    finalAlertShown = false;
-    updateTimerDisplay();
-    playPauseTimerBtn.innerHTML = '&#9658;';
-    updateSolutionButtonState();
-    showFullscreenUIAndResetHideTimer();
-  }
-
-  playPauseTimerBtn.addEventListener('click', toggleTimer);
-  resetTimerBtn.addEventListener('click', resetTimer);
-
-  function updateSolutionButtonState() {
-    const allSolutionButtons = document.querySelectorAll('.problem .show-solution');
-
-    allSolutionButtons.forEach(button => {
-      const problemElement = button.closest('.problem');
-      const isFullscreenActiveProblem = problemElement && problemElement.classList.contains('fullscreen-active');
-
-      if (timerRunning && isFullscreenActiveProblem) {
-        button.classList.add('locked');
-        button.setAttribute('title', 'Při běžícím odpočtu jsou výsledky blokovány');
-        button.onclick = (event) => {
-          event.stopPropagation();
-        };
-      } else {
-        button.classList.remove('locked');
-        button.removeAttribute('title');
-        button.onclick = function(event) {
-          event.stopPropagation();
-          showSolution(this.dataset.series, parseInt(this.dataset.num));
-        };
-      }
-    });
-  }
-
-  function updateProjectionButtonPosition() {
-    const projectionButton = document.querySelector('.projection-button');
-    const header = document.querySelector('header');
-    if (projectionButton && header) {
-      const headerBottom = header.getBoundingClientRect().bottom;
-      const newTop = Math.max(20, headerBottom + 10);
-      projectionButton.style.top = `${newTop}px`;
-    }
-  }
-
-  function toggleDeveloperMode() {
-    developerModeActive = developerModeCheckbox.checked;
-    loadProblems();
-    updateCategorySummary();
-    updateClassificationStatus(); // NOVÉ
-  }
-
-  function handleCategoryCheckboxChange(series, num, category, isChecked) {
-    const problemId = `${series}/${num}`;
-    if (!problemCategoryData[problemId]) {
-      problemCategoryData[problemId] = [];
-    }
-
-    if (isChecked) {
-      if (!problemCategoryData[problemId].includes(category)) {
-        problemCategoryData[problemId].push(category);
-      }
-    } else {
-      problemCategoryData[problemId] = problemCategoryData[problemId].filter(cat => cat !== category);
-      if (problemCategoryData[problemId].length === 0) {
-        delete problemCategoryData[problemId];
-      }
-    }
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(problemCategoryData));
-    updateCategorySummary();
-    updateClassificationStatus(); // NOVÉ
-  }
-
-  function getSelectedSeriesIds() {
-    const seriesSelect = document.getElementById("series");
-    const selected = Array.from(seriesSelect.selectedOptions).map(o => o.value);
-    return selected;
-  }
-
-  function buildCategorySummaryText() {
-    let finalLines = [];
-    const summaryBySeriesForCategory = {}; // { "Category Name": { "series": [nums], ... }, ... }
-
-    // Populate summaryBySeriesForCategory
-    for (const problemId in problemCategoryData) {
-        const [series, numStr] = problemId.split('/');
-        const num = parseInt(numStr, 10);
-        const categoriesForProblem = problemCategoryData[problemId];
-
-        categoriesForProblem.forEach(category => {
-            if (!summaryBySeriesForCategory[category]) {
-                summaryBySeriesForCategory[category] = {};
-            }
-            if (!summaryBySeriesForCategory[category][series]) {
-                summaryBySeriesForCategory[category][series] = [];
-            }
-            summaryBySeriesForCategory[category][series].push(num);
-        });
-    }
-
-    const selectedSeries = getSelectedSeriesIds();
-    let allSeriesInProblemData = new Set();
-    for (const problemId in problemCategoryData) {
-        allSeriesInProblemData.add(problemId.split('/')[0]);
-    }
-    allSeriesInProblemData = Array.from(allSeriesInProblemData).sort();
-
-    // Determine which series to display for each category
-    let seriesToConsider = selectedSeries.length > 0 ? selectedSeries : allSeriesInProblemData;
-    seriesToConsider.sort(); // Ensure consistent order of series
-
-    // Iterate through PROBLEM_CATEGORIES to maintain order
-    PROBLEM_CATEGORIES.forEach(categoryName => {
-        seriesToConsider.forEach(series => {
-            const problemsInThisSeriesForCategory = (summaryBySeriesForCategory[categoryName] && summaryBySeriesForCategory[categoryName][series]) || [];
-            problemsInThisSeriesForCategory.sort((a, b) => a - b);
-            const numsText = problemsInThisSeriesForCategory.join(',');
-            finalLines.push(`"${series}": [${numsText}] //${categoryName}`);
-        });
-    });
-
-    return finalLines.join('\n');
-  }
-
-  function updateCategorySummary() {
-    if (!developerModeActive) {
-      developerModeSummary.style.display = 'none';
-      return;
-    }
-
-    developerModeSummary.style.display = 'block';
-
-    const summaryText = buildCategorySummaryText();
-    categorySummaryContent.textContent = summaryText;
-  }
-
-  // NOVÉ: Funkce pro aktualizaci stavu zatřídění
-  function updateClassificationStatus() {
-    if (!developerModeActive || currentDisplayedProblems.length === 0) {
-        classificationStatusDiv.style.display = 'none';
-        classificationStatusDiv.classList.remove('all-classified', 'not-all-classified');
-        return;
-    }
-
-    let unclassifiedProblemIndices = [];
-    currentDisplayedProblems.forEach(problem => {
-        const problemId = `${problem.series}/${problem.num}`;
-        if (!problemCategoryData[problemId] || problemCategoryData[problemId].length === 0) {
-            unclassifiedProblemIndices.push(problem.displayIndex);
-        }
-    });
-
-    classificationStatusDiv.style.display = 'block';
-    classificationStatusDiv.classList.remove('all-classified', 'not-all-classified');
-
-    if (unclassifiedProblemIndices.length === 0) {
-        classificationStatusDiv.classList.add('all-classified');
-        classificationStatusDiv.textContent = 'Všechny příklady ve výpisu byly zatřízeny';
-    } else {
-        classificationStatusDiv.classList.add('not-all-classified');
-        classificationStatusDiv.textContent = `Nebyly zatřízeny příklady číslo: ${unclassifiedProblemIndices.join(', ')}`;
-    }
-  }
-
-
-  function clearAllCategories() {
-    if (confirm("Opravdu chcete smazat všechny zaškrtnuté kategorie u všech příkladů? Tato akce je nevratná.")) {
-      problemCategoryData = {};
-      localStorage.removeItem(LOCAL_STORAGE_KEY);
-      loadProblems();
-      updateCategorySummary();
-      updateClassificationStatus(); // NOVÉ
-    }
-  }
-
-  function downloadCategorySummaryAsTxt() {
-    const summaryText = buildCategorySummaryText();
-
-    const selectedSeries = getSelectedSeriesIds();
-    let seriesForFilename;
-    if (selectedSeries.length > 0) {
-      seriesForFilename = selectedSeries;
-    } else {
-      const seriesFromData = new Set();
-      for (const problemId in problemCategoryData) {
-        const [series] = problemId.split('/');
-        seriesFromData.add(series);
-      }
-      seriesForFilename = Array.from(seriesFromData);
-    }
-
-    if (seriesForFilename.length === 0) {
-      alert("Není co stahovat – nejsou přiřazeny žádné kategorie.");
-      return;
-    }
-
-    seriesForFilename.sort();
-    const filename = seriesForFilename.join('_') + '.txt';
-
-    const blob = new Blob([summaryText], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }
-
-  categorySummaryContent.addEventListener('mouseup', (e) => {
-    const selectedText = window.getSelection().toString();
-    if (selectedText.length > 0 && categorySummaryContent.contains(e.target)) {
-      navigator.clipboard.writeText(selectedText).then(() => {
-        copyFeedback.style.opacity = '1';
-        setTimeout(() => {
-          copyFeedback.style.opacity = '0';
-        }, 2000);
+  // Event listener for copying the shareable link
+  const pinnedShareLink = document.getElementById('pinnedShareLink');
+  if (pinnedShareLink) {
+    pinnedShareLink.addEventListener('click', (e) => {
+      e.preventDefault(); // Prevent navigation
+      const textToCopy = pinnedShareLink.textContent;
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        showCopyFeedback("Odkaz zkopírován do schránky!");
       }).catch(err => {
-        console.error('Failed to copy text: ', err);
+        console.error('Nepodařilo se zkopírovat odkaz:', err);
       });
-    }
-  });
+    });
+  }
 
-  document.addEventListener('DOMContentLoaded', () => {
-    generateMasterProblemList();
-    updateProgressBar();
-
-    const storedData = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (storedData) {
-      problemCategoryData = JSON.parse(storedData);
-    }
-    developerModeCheckbox.checked = localStorage.getItem('developerModeActive') === 'true';
-    developerModeActive = developerModeCheckbox.checked;
-
-    const nextProblemArrow = document.getElementById('nextProblemArrow');
-    if (nextProblemArrow) {
-      nextProblemArrow.addEventListener('click', () => {
-        navigateToNextProblemInFullscreen();
-        updateFullscreenProblemCounter();
-      });
-    }
-    const prevProblemArrow = document.getElementById('prevProblemArrow');
-    if (prevProblemArrow) {
-      prevProblemArrow.addEventListener('click', () => {
-        navigateToPrevProblemInFullscreen();
-        updateFullscreenProblemCounter();
-      });
-    }
-
-    if (clearCategorySummaryBtn) {
-      clearCategorySummaryBtn.addEventListener('click', clearAllCategories);
-    }
-    if (downloadCategorySummaryBtn) {
-      downloadCategorySummaryBtn.addEventListener('click', downloadCategorySummaryAsTxt);
-    }
-
-    loadProblems();
-    updateProjectionButtonPosition();
-    updateTimerDisplay();
-    updateSolutionButtonState();
-    updateCategorySummary();
-    updateClassificationStatus(); // NOVÉ
-  });
-
-  window.addEventListener('scroll', () => {
-    updateProgressBar();
-    updateProjectionButtonPosition();
-  });
-  window.addEventListener('resize', () => {
-    updateProgressBar();
-    updateProjectionButtonPosition();
-  });
-
-  developerModeCheckbox.addEventListener('change', () => {
-    localStorage.setItem('developerModeActive', developerModeCheckbox.checked);
-  });
 </script>
 </body>
 </html>
