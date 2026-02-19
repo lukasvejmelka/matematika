@@ -303,7 +303,8 @@
 
     .toggle-advanced-filters,
     .go-to-problems-button,
-    .reset-filters-button {
+    .reset-filters-button,
+    .print-export-button {
       display: block;
       width: 100%;
       padding: 0.75rem 1.5rem;
@@ -339,6 +340,14 @@
 
     .reset-filters-button:hover {
       background-color: #d32f2f;
+    }
+
+    .print-export-button {
+      background-color: #37474f;
+    }
+
+    .print-export-button:hover {
+      background-color: #263238;
     }
 
     #advancedFilters {
@@ -1086,6 +1095,146 @@
       background-color: #263238;
     }
 
+    /* --- PRINT STYLES --- */
+    #printHeader {
+      display: none;
+      margin-bottom: 0.5rem; /* Minimal margin */
+      border-bottom: 1px solid #ccc; /* Lighter border */
+      padding-bottom: 0.5rem; /* Minimal padding */
+      padding-top: 0.5rem; /* Minimal padding */
+    }
+
+    @media print {
+      body {
+        background-color: white !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      
+      header, .projection-button, #exitFullscreenButton, 
+      #pinnedSection, .filters-section, #backToTopBtn,
+      #classificationStatus, #developerModeSummary, 
+      .overlay, .fullscreen-nav-arrow, #fullscreenProblemCounter,
+      #fullscreenTimer, #fullscreenTimerControls, .copy-feedback,
+      .controls-row, .category-checkbox-group {
+        display: none !important;
+      }
+
+      .container {
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0.5cm !important; /* Small page margins */
+      }
+
+      #printHeader {
+        display: flex !important; /* Use flexbox for layout */
+        justify-content: space-between !important; /* Space between QR and text */
+        align-items: flex-start !important; /* Align items to the top */
+        font-family: "Segoe UI", sans-serif;
+        margin-bottom: 0.5rem !important;
+        border-bottom: 1px solid #ccc !important;
+        padding-bottom: 0.5rem !important;
+        padding-top: 0.5rem !important;
+      }
+
+      #printHeader .text-content {
+        flex-grow: 1;
+        text-align: right; /* Align text content to the right */
+        margin-left: 1rem; /* Space between QR and text */
+      }
+
+      #printHeader h2 {
+        margin: 0 0 0.1rem 0 !important; /* Smaller margin */
+        font-size: 1rem !important; /* Smaller font */
+        text-align: right !important;
+      }
+
+      #printHeader p {
+        margin: 0.05rem 0 !important; /* Even smaller margin */
+        font-size: 0.7rem !important; /* Much smaller font */
+        color: #333 !important;
+        text-align: right !important;
+      }
+
+      #qrCodeContainer {
+        display: block !important;
+        margin-top: 0 !important; /* Remove top margin */
+        text-align: left !important; /* Align QR to the left */
+        flex-shrink: 0; /* Prevent QR from shrinking */
+      }
+      #qrCodeContainer canvas {
+        width: 160px !important; /* Doubled QR code size */
+        height: 160px !important;
+        border: 1px solid #eee;
+        padding: 3px;
+      }
+
+      .problem {
+        box-shadow: none !important;
+        border: 1px solid #ccc !important; /* Thinner, lighter border */
+        margin-bottom: 1rem !important; /* Reduced margin */
+        page-break-inside: avoid;
+        padding: 0.75rem !important; /* Reduced padding */
+        background: #fff !important;
+        text-align: left !important; /* Align problem content left */
+      }
+
+      .problem-header-content {
+        flex-direction: row !important; /* Align header content in a row */
+        align-items: baseline !important; /* Align items to baseline */
+        gap: 0.5rem !important; /* Smaller gap */
+        margin-bottom: 0.2rem !important; /* Reduced margin */
+        padding-top: 0 !important;
+      }
+
+      .problem-info-text {
+        display: flex;
+        flex-direction: row;
+        align-items: baseline;
+        gap: 0.5rem;
+        flex-grow: 1; /* Allow it to take space */
+        width: auto !important;
+        order: 1;
+      }
+
+      .problem-number {
+        color: #000 !important;
+        font-size: 0.9rem !important; /* Smaller font */
+        text-align: left !important;
+        margin-bottom: 0 !important;
+        white-space: nowrap; /* Prevent wrapping */
+      }
+
+      .problem-id {
+        color: #555 !important; /* Slightly darker for readability */
+        font-weight: normal !important; /* Less bold */
+        font-size: 0.8rem !important; /* Smaller font */
+        text-align: left !important;
+        margin-bottom: 0 !important;
+        white-space: nowrap; /* Prevent wrapping */
+      }
+
+      .problem img {
+        box-shadow: none !important;
+        border: 1px solid #eee !important;
+        margin-top: 0.5rem !important; /* Reduced margin */
+      }
+
+      /* Skrýt tlačítka uvnitř příkladů */
+      .show-solution, .pin-button {
+        display: none !important;
+      }
+    }
+
+    /* Explicitně zajistit, že se tyto styly aplikují POUZE na obrazovku */
+    @media screen {
+      .container {
+        max-width: 900px;
+        margin: 1rem auto;
+        padding: 0 1rem;
+      }
+    }
+
 
     @media (max-width: 768px) {
       header {
@@ -1405,6 +1554,16 @@
 </button>
 
 <div class="container">
+  <!-- TISKTOVÁ HLAVIČKA (viditelná jen při tisku) -->
+  <div id="printHeader">
+    <div id="qrCodeContainer"></div> <!-- Kontejner pro QR kód -->
+    <div class="text-content">
+      <h2 id="printTitle">Export příkladů z portálu procvičování</h2>
+      <p id="printInfoLine"></p>
+      <p id="printIdsLine"></p>
+    </div>
+  </div>
+
   <!-- NOVÉ: Sekce pro přišpendlené příklady -->
   <div id="pinnedSection">
     <h2>Přišpendlené příklady:</h2>
@@ -1505,6 +1664,8 @@
     </div>
 
     <button class="go-to-problems-button" onclick="loadProblemsAndScroll()">Přejít na výpis příkladů</button>
+    <!-- NOVÉ: Tlačítko Vytisknout výpis (PDF) -->
+    <button class="print-export-button" onclick="prepareAndPrint()">Vytisknout výpis (PDF)</button>
     <!-- NOVÉ: Tlačítko Resetovat filtr -->
     <button class="reset-filters-button" onclick="resetFilters()">Resetovat filtr</button>
 
@@ -1594,6 +1755,7 @@
 </div>
 
 <script src="tasks-data.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script> <!-- QRious library -->
 
 <script>
   let masterProblemList = [];
@@ -1790,10 +1952,11 @@
   copyPinnedLinkBtn.addEventListener('click', copyLinkToClipboard);
 
   function showCopyFeedback(message) {
-    copyFeedback.textContent = message;
-    copyFeedback.style.opacity = '1';
+    const feedback = document.getElementById('copyFeedback');
+    feedback.textContent = message;
+    feedback.style.opacity = '1';
     setTimeout(() => {
-      copyFeedback.style.opacity = '0';
+      feedback.style.opacity = '0';
     }, 2000);
   }
 
@@ -1823,8 +1986,6 @@
     updateCategorySummary();
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    // Do NOT call loadProblems() or updateFiltersByDifficulty() here.
-    // The user must explicitly click "Přejít na výpis příkladů" or select new filters.
   }
 
   function loadFromIdList(input) {
@@ -1964,7 +2125,7 @@
     });
     backToTopBtn.style.display = 'flex';
     updateClassificationStatus();
-    updateCategorySummary(); // Ensure summary visibility is updated after rendering problems
+    updateCategorySummary(); 
   }
 
   function loadProblemsAndScroll() {
@@ -2018,6 +2179,47 @@
     resetFilters();
   }
 
+  // --- PRINT FUNCTION ---
+  function prepareAndPrint() {
+    if (currentDisplayedProblems.length === 0) {
+      alert("Nejdříve vyberte příklady, které chcete vytisknout.");
+      return;
+    }
+
+    const customTitle = prompt("Zadejte název exportu:", "Export příkladů z portálu procvičování");
+    if (customTitle === null) { // User cancelled the prompt
+      return;
+    }
+
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('cs-CZ');
+    const timeStr = now.toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' });
+    
+    const ids = currentDisplayedProblems.map(p => `${p.series}/${p.num}`).join(','); // Use comma for URL
+    const baseUrl = `https://math.vejmelka.workers.dev/checking.html`; // Base URL for checking page
+    const qrLink = `${baseUrl}?ids=${ids}`;
+
+    document.getElementById('printTitle').textContent = customTitle; // Set custom title
+    document.getElementById('printInfoLine').textContent = `Export ze dne ${dateStr}, čas ${timeStr}.`;
+    document.getElementById('printIdsLine').textContent = `Výpis obsahuje příklady s ID: ${ids}`;
+
+    // Generate QR code
+    const qrCodeContainer = document.getElementById('qrCodeContainer');
+    qrCodeContainer.innerHTML = ''; // Clear previous QR code
+    if (ids.length > 0) { // Only generate if there are IDs
+      const qrCanvas = document.createElement('canvas');
+      qrCodeContainer.appendChild(qrCanvas);
+      new QRious({
+        element: qrCanvas,
+        value: qrLink,
+        size: 150, // Size for screen, print media will override
+        level: 'H' // High error correction
+      });
+    }
+
+    window.print();
+  }
+
   // --- OVERLAY & FULLSCREEN LOGIC ---
 
   function closeOverlay() {
@@ -2065,7 +2267,6 @@
   document.getElementById("prevBtn").addEventListener("click", () => navigateSolution('prev'));
   document.getElementById("nextBtn").addEventListener("click", () => navigateSolution('next'));
 
-  // MEZERNÍK LOGIC
   document.addEventListener("keydown", function(e) {
     const isOverlayOpen = overlay.style.display === "flex";
     const isFullscreen = !!document.fullscreenElement;
@@ -2335,8 +2536,8 @@
   function toggleDeveloperMode() {
     developerModeActive = developerModeCheckbox.checked;
     localStorage.setItem('developerModeActive', developerModeActive);
-    renderProblems(); // Re-render to show/hide checkboxes and summary
-    updateCategorySummary(); // Update summary visibility
+    renderProblems(); 
+    updateCategorySummary(); 
   }
 
   function handleCategoryCheckboxChange(series, num, category, isChecked) {
@@ -2381,7 +2582,7 @@
       localStorage.removeItem(LOCAL_STORAGE_KEY);
       updateCategorySummary();
       updateClassificationStatus();
-      renderProblems(); // Re-render to clear checkboxes
+      renderProblems(); 
     }
   }
 
@@ -2466,7 +2667,7 @@
       if (firstTopicOption) {
         firstTopicOption.selected = true;
       }
-      updateFiltersByDifficulty(); // This will call loadProblems()
+      updateFiltersByDifficulty(); 
     }
 
     updateProjectionButtonPosition();
@@ -2527,7 +2728,6 @@
     problemIdHelpText.textContent = 'Nápověda: Zadejte ID ve formátu "16j/12"';
 
     if (inputId === '') {
-      // If input is cleared, behave like a soft reset for problems display
       document.getElementById("problems").innerHTML = '<p style="text-align: center; margin-top: 2rem; font-size: 1.1rem; color: #555;">Vyberte filtry pro zobrazení příkladů.</p>';
       document.getElementById("problemCount").textContent = `Počet příkladů: 0`;
       backToTopBtn.style.display = 'none';
@@ -2544,12 +2744,11 @@
       problemIdInput.classList.add('valid-id');
       showProblemById(true);
     } else if (prefixMatch) {
-      // Partial prefix match - do nothing, allow user to continue typing
+      // Partial prefix match
     } else {
       problemIdInput.classList.add('invalid-id');
       problemIdHelpText.textContent = 'Neexistující ID';
       problemIdHelpText.classList.add('error');
-      // Clear displayed problems if invalid ID and no partial match
       currentDisplayedProblems = []; 
       document.getElementById("problems").innerHTML = '<p style="text-align: center; margin-top: 2rem; font-size: 1.1rem; color: #555;">Žádné příklady neodpovídají zadanému ID.</p>';
       document.getElementById("problemCount").textContent = `Počet příkladů: 0`;

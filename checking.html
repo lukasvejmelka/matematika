@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Řešení příkladů</title>
+  <style>
+    /* Basic reset */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background-color: #f5f7fa;
+      line-height: 1.4;
+      color: #333;
+    }
+
+    header {
+      background-color: #1e88e5;
+      color: white;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .logo-link {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+      text-decoration: none;
+    }
+
+    .logo {
+      max-width: 60px;
+      height: auto;
+      flex-shrink: 0;
+    }
+
+    h1 {
+      margin: 0;
+      flex-grow: 1;
+      font-size: 1.5rem;
+      min-width: 200px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 1rem auto;
+      padding: 0 1rem;
+    }
+
+    #solutionsContainer {
+      margin-top: 2rem;
+    }
+
+    .solution-problem {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+      padding: 1.5rem;
+      text-align: center;
+      border: 1px solid #ccc; /* Gray box */
+    }
+
+    .solution-problem-header {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+      gap: 0.5rem;
+    }
+
+    .solution-problem-number {
+      font-weight: bold;
+      font-size: 1.3rem;
+      color: #1e88e5;
+      text-align: left;
+    }
+
+    .solution-problem-id {
+      font-size: 0.9rem;
+      color: #666;
+      text-align: left;
+      font-weight: 500;
+    }
+
+    .solution-problem img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .no-solutions-message {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 1.1rem;
+      color: #555;
+    }
+
+    /* Mobile responsiveness for checking.html */
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        text-align: center;
+        padding: 1rem 0.5rem;
+      }
+      .logo {
+        max-width: 80px;
+      }
+      h1 {
+        font-size: 1.2rem;
+        margin: 0.5rem 0;
+        min-width: auto;
+      }
+      .container {
+        margin: 0.5rem auto;
+        padding: 0 0.5rem;
+      }
+      .solution-problem {
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+      }
+      .solution-problem-header {
+        flex-direction: row; /* Align header content in a row for smaller screens */
+        align-items: baseline;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+      }
+      .solution-problem-number {
+        font-size: 1.1rem;
+      }
+      .solution-problem-id {
+        font-size: 0.85rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.1rem;
+      }
+      .solution-problem-number {
+        font-size: 1rem;
+      }
+      .solution-problem-id {
+        font-size: 0.8rem;
+      }
+    }
+
+    /* Print styles for checking.html */
+    @media print {
+      body {
+        background-color: white !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      header {
+        display: none !important; /* Hide header in print */
+      }
+      .container {
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0.5cm !important; /* Small page margins */
+      }
+      .solution-problem {
+        box-shadow: none !important;
+        border: 1px solid #ccc !important; /* Gray box */
+        margin-bottom: 1.5rem !important; /* Space between problems */
+        page-break-inside: avoid; /* Prevent breaking inside a problem */
+        padding: 0.75rem !important;
+      }
+      .solution-problem-header {
+        flex-direction: row !important;
+        align-items: baseline !important;
+        gap: 0.5rem !important;
+        margin-bottom: 0.5rem !important;
+      }
+      .solution-problem-number {
+        font-size: 0.9rem !important;
+        color: #000 !important;
+        white-space: nowrap;
+      }
+      .solution-problem-id {
+        font-size: 0.8rem !important;
+        color: #555 !important;
+        font-weight: normal !important;
+        white-space: nowrap;
+      }
+      .solution-problem img {
+        box-shadow: none !important;
+        border: 1px solid #eee !important;
+        margin-top: 0.5rem !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="index.html" class="logo-link" title="Zpět na hlavní stránku">
+      <img src="assets/logo.png" alt="Logo" class="logo">
+    </a>
+    <h1>Řešení příkladů</h1>
+  </header>
+
+  <div class="container">
+    <div id="solutionsContainer">
+      <!-- Solutions will be rendered here -->
+      <p class="no-solutions-message">Načítám řešení...</p>
+    </div>
+  </div>
+
+  <script src="tasks-data.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const solutionsContainer = document.getElementById('solutionsContainer');
+      const urlParams = new URLSearchParams(window.location.search);
+      const idsParam = urlParams.get('ids');
+
+      if (!idsParam) {
+        solutionsContainer.innerHTML = '<p class="no-solutions-message">Žádné ID příkladů nebyly nalezeny v URL. Zkuste naskenovat QR kód z tiskového výpisu.</p>';
+        return;
+      }
+
+      const problemIds = idsParam.split(',').map(id => id.trim()).filter(id => id !== '');
+
+      if (problemIds.length === 0) {
+        solutionsContainer.innerHTML = '<p class="no-solutions-message">Žádné platné ID příkladů nebyly nalezeny.</p>';
+        return;
+      }
+
+      let problemsToDisplay = [];
+      problemIds.forEach(id => {
+        const [series, numStr] = id.split('/');
+        const num = parseInt(numStr);
+        
+        // Validate against problemsCount from tasks-data.js
+        if (series && !isNaN(num) && problemsCount && problemsCount[series] && num >= 1 && num <= problemsCount[series]) {
+          problemsToDisplay.push({ series, num, id });
+        } else {
+          console.warn(`Invalid problem ID found: ${id}`);
+        }
+      });
+
+      if (problemsToDisplay.length === 0) {
+        solutionsContainer.innerHTML = '<p class="no-solutions-message">Žádné platné příklady nebyly nalezeny pro zobrazení řešení.</p>';
+        return;
+      }
+
+      solutionsContainer.innerHTML = ''; // Clear "Načítám řešení..." message
+
+      problemsToDisplay.forEach((problem, index) => {
+        const solutionElement = document.createElement('div');
+        solutionElement.className = 'solution-problem';
+        solutionElement.innerHTML = `
+          <div class="solution-problem-header">
+            <div class="solution-problem-number">Příklad ${index + 1}</div>
+            <div class="solution-problem-id">ID: ${problem.id}</div>
+          </div>
+          <img src="files/${problem.series}/${problem.num}_res.png" alt="Řešení příkladu ${problem.id}">
+        `;
+        solutionsContainer.appendChild(solutionElement);
+      });
+    });
+  </script>
+</body>
+</html>
