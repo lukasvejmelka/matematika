@@ -304,7 +304,7 @@
     .toggle-advanced-filters,
     .go-to-problems-button,
     .reset-filters-button,
-    .print-export-button {
+    .print-export-button { /* Re-added .print-export-button here */
       display: block;
       width: 100%;
       padding: 0.75rem 1.5rem;
@@ -342,8 +342,10 @@
       background-color: #d32f2f;
     }
 
+    /* Specific style for the print button, now hidden by default */
     .print-export-button {
       background-color: #37474f;
+      display: none; /* Hidden by default, JS will show it when needed */
     }
 
     .print-export-button:hover {
@@ -1116,7 +1118,7 @@
       #classificationStatus, #developerModeSummary, 
       .overlay, .fullscreen-nav-arrow, #fullscreenProblemCounter,
       #fullscreenTimer, #fullscreenTimerControls, .copy-feedback,
-      .controls-row, .category-checkbox-group {
+      .controls-row, .category-checkbox-group, .print-export-button { /* Ensure print button is hidden in print */
         display: none !important;
       }
 
@@ -1217,7 +1219,7 @@
       .problem img {
         box-shadow: none !important;
         border: 1px solid #eee !important;
-        margin-top: 0.5rem !important; /* Reduced margin */
+        margin-top: 0.5rem !important;
       }
 
       /* Skrýt tlačítka uvnitř příkladů */
@@ -1664,8 +1666,8 @@
     </div>
 
     <button class="go-to-problems-button" onclick="loadProblemsAndScroll()">Přejít na výpis příkladů</button>
-    <!-- NOVÉ: Tlačítko Vytisknout výpis (PDF) -->
-    <button class="print-export-button" onclick="prepareAndPrint()">Vytisknout výpis (PDF)</button>
+    <!-- Tlačítko Vytisknout výpis (PDF) je zpět zde -->
+    <button id="printExportButton" class="print-export-button" onclick="prepareAndPrint()">Vytisknout výpis (PDF)</button>
     <!-- NOVÉ: Tlačítko Resetovat filtr -->
     <button class="reset-filters-button" onclick="resetFilters()">Resetovat filtr</button>
 
@@ -1828,6 +1830,7 @@
   const pinnedShareLink = document.getElementById('pinnedShareLink');
   const copyPinnedLinkBtn = document.getElementById('copyPinnedLinkBtn');
   const backToTopBtn = document.getElementById('backToTopBtn');
+  const printExportButton = document.getElementById('printExportButton'); // Get reference to the print button
 
   let currentProblemIndex = -1;
 
@@ -1928,8 +1931,17 @@
     if (confirm("Opravdu chcete smazat celý výčet přišpendlených příkladů?")) {
       pinnedProblems.clear();
       localStorage.removeItem(PINNED_STORAGE_KEY);
-      updatePinnedUI();
-      loadProblems();
+      updatePinnedUI(); // This hides the pinnedSection
+
+      // If the user is currently viewing problems loaded from the ID list input (e.g., from a URL)
+      // then clearing the pinned list should also clear that input and hide the print button.
+      if (idListInput.value.trim() !== '') {
+        idListInput.value = ''; // Clear the input field
+        loadFromIdList(''); // Trigger reload with empty input, which will hide the print button
+      } else {
+        // If idListInput was already empty, just reload problems based on other filters
+        loadProblems();
+      }
     }
   }
 
@@ -1986,6 +1998,7 @@
     updateCategorySummary();
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    updatePrintButtonVisibilityBasedOnProblems(); // Update print button visibility after reset
   }
 
   function loadFromIdList(input) {
@@ -1997,6 +2010,7 @@
       currentDisplayedProblems = [];
       updateClassificationStatus();
       updateCategorySummary();
+      updatePrintButtonVisibilityBasedOnProblems(); // Hide print button if input is empty
       return;
     }
 
@@ -2086,6 +2100,7 @@
     if (currentDisplayedProblems.length === 0) {
       problemsDiv.innerHTML = '<p style="text-align: center; margin-top: 2rem; font-size: 1.1rem; color: #555;">Žádné příklady neodpovídají vybraným filtrům.</p>';
       backToTopBtn.style.display = 'none';
+      updatePrintButtonVisibilityBasedOnProblems(); // Hide button if no problems
       return;
     }
 
@@ -2126,6 +2141,7 @@
     backToTopBtn.style.display = 'flex';
     updateClassificationStatus();
     updateCategorySummary(); 
+    updatePrintButtonVisibilityBasedOnProblems(); // Update print button visibility after rendering
   }
 
   function loadProblemsAndScroll() {
@@ -2620,6 +2636,17 @@
     adv.style.display = adv.style.display === "block" ? "none" : "block";
   }
 
+  // New function to manage print button visibility based on displayed problems from ID list
+  function updatePrintButtonVisibilityBasedOnProblems() {
+    // The button should be visible if the ID list input has content AND there are problems displayed.
+    // This covers both direct input and URL-loaded IDs.
+    if (idListInput.value.trim() !== '' && currentDisplayedProblems.length > 0) {
+      printExportButton.style.display = 'block';
+    } else {
+      printExportButton.style.display = 'none';
+    }
+  }
+
   // --- INIT ---
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -2657,8 +2684,8 @@
     if (urlSearch.startsWith('?=')) {
       const idsFromUrl = urlSearch.substring(2);
       if (idsFromUrl.trim() !== '') {
-        loadFromIdList(idsFromUrl);
-        idListInput.value = idsFromUrl;
+        idListInput.value = idsFromUrl; // Set the input value from URL
+        loadFromIdList(idsFromUrl); // Load problems, which will then update button visibility
       }
     } else {
       // Set default topic to "1. Číselné obory, procenta"
@@ -2676,6 +2703,7 @@
     updateCategorySummary();
     updateClassificationStatus();
     hideFullscreenUI();
+    updatePrintButtonVisibilityBasedOnProblems(); // Initial check for print button visibility
   });
 
   overlayHeader.addEventListener('mousedown', (e) => {
@@ -2734,6 +2762,7 @@
       currentDisplayedProblems = [];
       updateClassificationStatus();
       updateCategorySummary();
+      updatePrintButtonVisibilityBasedOnProblems(); // Hide button if input is cleared
       return;
     }
 
@@ -2742,9 +2771,9 @@
 
     if (exactMatch) {
       problemIdInput.classList.add('valid-id');
-      showProblemById(true);
+      showProblemById(true); // showProblemById calls renderProblems, which calls updatePrintButtonVisibilityBasedOnProblems
     } else if (prefixMatch) {
-      // Partial prefix match
+      // Partial prefix match - no change to print button visibility based on this
     } else {
       problemIdInput.classList.add('invalid-id');
       problemIdHelpText.textContent = 'Neexistující ID';
@@ -2755,6 +2784,7 @@
       backToTopBtn.style.display = 'none';
       updateClassificationStatus();
       updateCategorySummary();
+      updatePrintButtonVisibilityBasedOnProblems(); // Hide button if no problems found
     }
   }
 
