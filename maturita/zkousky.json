@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "student": "Tereza Malá",
+    "predmet": "Český jazyk",
+    "zkousejici": "Mgr. Jana Horáková",
+    "priprava_zacatek": "09:00",
+    "priprava_konec": "09:20",
+    "ustni_zacatek": "09:20",
+    "ustni_konec": "09:35"
+  },
+  {
+    "id": 2,
+    "student": "Jakub Procházka",
+    "predmet": "Matematika",
+    "zkousejici": "RNDr. Petr Novák",
+    "priprava_zacatek": "09:05",
+    "priprava_konec": "09:25",
+    "ustni_zacatek": "09:25",
+    "ustni_konec": "09:40"
+  },
+  {
+    "id": 3,
+    "student": "Adéla Svobodová",
+    "predmet": "Angličtina",
+    "zkousejici": "PhDr. Marie Čermáková",
+    "priprava_zacatek": "09:10",
+    "priprava_konec": "09:30",
+    "ustni_zacatek": "09:30",
+    "ustni_konec": "09:45"
+  },
+  {
+    "id": 4,
+    "student": "Martin Horák",
+    "predmet": "Dějepis",
+    "zkousejici": "Mgr. Tomáš Kříž",
+    "priprava_zacatek": "09:40",
+    "priprava_konec": "10:00",
+    "ustni_zacatek": "10:00",
+    "ustni_konec": "10:15"
+  }
+]
